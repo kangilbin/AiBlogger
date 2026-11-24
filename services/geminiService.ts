@@ -97,7 +97,10 @@ async function callModel(model: string, key: string, body: object): Promise<Atte
 
   if (res.status === 429) {
     cooldown.set(model, Date.now() + COOLDOWN_MS);
-    return { ok: false, next: true, reason: 'quota' };
+    // 구글이 알려주는 실제 사유(어떤 한도인지/자원 부족인지)를 보존해 안내에 보여줌
+    const j429 = await res.clone().json().catch(() => null);
+    const detail: string = j429?.error?.message ?? '';
+    return { ok: false, next: true, reason: 'quota', detail: detail ? `[${model}] ${detail}` : undefined };
   }
   // 서버 과부하/일시 오류 → 다음 모델 시도 (모두 실패하면 generatePost에서 재시도)
   if (res.status === 500 || res.status === 502 || res.status === 503 || res.status === 504) {
@@ -155,6 +158,7 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
   let sawQuota = false;
   let sawOverload = false;
   let lastDetail: string | null = null;
+  let quotaDetail: string | null = null;
   let text: string | null = null;
   // 과부하(503)는 잠깐 뒤 풀리는 경우가 많아 대기 시간을 늘려가며 최대 5라운드(모든 모델 순회)까지 재시도
   for (let round = 0; round <= OVERLOAD_BACKOFF_MS.length && text === null; round++) {
@@ -169,7 +173,10 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
       const r = await callModel(model, key, body);
       if (r.ok) { text = r.text; break; }
       if (!r.next) throw r.error;
-      if (r.reason === 'quota') sawQuota = true;
+      if (r.reason === 'quota') {
+        sawQuota = true;
+        if (r.detail) quotaDetail = r.detail;
+      }
       if (r.reason === 'overloaded') sawOverload = true;
       if (r.detail) lastDetail = r.detail;
     }
@@ -181,7 +188,10 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
     if (sawOverload)
       throw new AppError('UNKNOWN', 'Gemini 서버가 혼잡해 여러 번 재시도했지만 실패했어요(503). 사용량 한도 문제가 아니에요. 1~2분 뒤 다시 시도해주세요.');
     if (sawQuota)
-      throw new AppError('GEMINI_QUOTA', '분당/일일 무료 요청 한도에 걸렸어요. 1분 정도 뒤에 다시 시도해주세요.');
+      throw new AppError(
+        'GEMINI_QUOTA',
+        `요청 한도에 걸렸어요. 1분 정도 뒤에 다시 시도해주세요.${quotaDetail ? `\n\n(구글 응답: ${quotaDetail.slice(0, 200)})` : ''}`
+      );
     // 요청 자체가 거부된 경우(모든 모델이 400/404)는 실제 사유를 보여줘서 원인을 알 수 있게 함
     if (lastDetail)
       throw new AppError('UNKNOWN', `글 생성 요청이 거부되었어요: ${lastDetail.slice(0, 160)}`);
