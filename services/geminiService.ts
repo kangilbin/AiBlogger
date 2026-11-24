@@ -164,6 +164,8 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
     }
     sawOverload = false;
     for (const model of queue) {
+      // 이번 생성 중 429(분당 한도)에 걸린 모델은 재시도로 한도를 더 소모하지 않도록 건너뜀 (단, 전부 쿨다운이면 시도)
+      if (queue.length > 1 && (cooldown.get(model) ?? 0) > Date.now()) continue;
       const r = await callModel(model, key, body);
       if (r.ok) { text = r.text; break; }
       if (!r.next) throw r.error;
@@ -175,10 +177,11 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
   }
 
   if (text === null) {
-    if (sawOverload && !sawQuota)
-      throw new AppError('UNKNOWN', 'Gemini 서버가 혼잡해 여러 번 재시도했지만 실패했어요(503). 1~2분 뒤 다시 시도해주세요.');
+    // 마지막 라운드에서 혼잡(503)이 있었다면 원인은 서버 혼잡 — 재시도 중 일부 모델이 분당 한도(429)에 걸렸어도 한도 초과로 안내하지 않음
+    if (sawOverload)
+      throw new AppError('UNKNOWN', 'Gemini 서버가 혼잡해 여러 번 재시도했지만 실패했어요(503). 사용량 한도 문제가 아니에요. 1~2분 뒤 다시 시도해주세요.');
     if (sawQuota)
-      throw new AppError('GEMINI_QUOTA', '무료 사용량 한도에 도달했어요. 잠시 후 다시 시도해주세요.');
+      throw new AppError('GEMINI_QUOTA', '분당/일일 무료 요청 한도에 걸렸어요. 1분 정도 뒤에 다시 시도해주세요.');
     // 요청 자체가 거부된 경우(모든 모델이 400/404)는 실제 사유를 보여줘서 원인을 알 수 있게 함
     if (lastDetail)
       throw new AppError('UNKNOWN', `글 생성 요청이 거부되었어요: ${lastDetail.slice(0, 160)}`);
