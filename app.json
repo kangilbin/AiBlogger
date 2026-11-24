@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "AI Bloger",
+    "slug": "ai-bloger-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.aibloger.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "블로그 글에 첨부할 사진을 선택하기 위해 사진 라이브러리에 접근합니다."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.aibloger.app",
+      "permissions": [
+        "READ_MEDIA_IMAGES",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "블로그 글에 첨부할 사진을 선택하기 위해 접근합니다."
+        }
+      ],
+      "expo-web-browser",
+      "expo-asset",
+      "expo-font",
+      "expo-notifications",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.907789268624-l37l7uho1sar63jbdacvd8f1t9n4olp1"
+        }
+      ]
+    ],
+    "scheme": "aibloger",
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "googleIosClientId": "907789268624-l37l7uho1sar63jbdacvd8f1t9n4olp1.apps.googleusercontent.com",
+      "googleAndroidClientId": "907789268624-onl2j9qkldsr6bpv9p8s8hj9a5vuies7.apps.googleusercontent.com",
+      "googleWebClientId": "907789268624-k2db40mrislta5pl8i0bfu53mb3s6ikp.apps.googleusercontent.com"
+    }
+  }
+}
