@@ -44,16 +44,29 @@ async function resolveModels(key: string): Promise<string[]> {
   return [GEMINI_MODEL]; // 목록 조회 실패 시 기본 모델
 }
 
+const REQUEST_TIMEOUT_MS = 60_000;
+/** 혼잡(503/시간초과) 시 라운드 사이 대기(ms). 지수적으로 늘려 서버가 풀릴 시간을 준다 */
+const OVERLOAD_BACKOFF_MS = [2000, 4000, 8000, 12000];
+
 type Attempt = { ok: true; text: string } | { ok: false; next: true; reason: string; detail?: string } | { ok: false; next: false; error: AppError };
 
 async function callModel(model: string, key: string, body: object): Promise<Attempt> {
   const url = `${GEMINI_API}/models/${model}:generateContent`;
-  const post = (b: object) =>
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify(b),
-    });
+  // 앱이 백그라운드로 가면 연결이 끊긴 채 응답이 영영 안 올 수 있어, 시간 제한을 두고 끊는다
+  const post = async (b: object) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      return await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+        body: JSON.stringify(b),
+        signal: ctrl.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+  };
 
   let res: Response;
   try {
@@ -67,7 +80,9 @@ async function callModel(model: string, key: string, body: object): Promise<Atte
         res = await post({ ...body, generationConfig: gc });
       }
     }
-  } catch {
+  } catch (e) {
+    // 응답이 너무 늦으면 혼잡으로 보고 다른 모델/다음 라운드로 재시도
+    if ((e as Error)?.name === 'AbortError') return { ok: false, next: true, reason: 'overloaded' };
     return { ok: false, next: false, error: new AppError('NETWORK', '네트워크 연결을 확인해주세요.') };
   }
 
@@ -141,9 +156,12 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
   let sawOverload = false;
   let lastDetail: string | null = null;
   let text: string | null = null;
-  // 과부하(503)는 잠깐 뒤 풀리는 경우가 많아 최대 3라운드까지 재시도
-  for (let round = 0; round < 3 && text === null; round++) {
-    if (round > 0) await new Promise((r) => setTimeout(r, 1500 * round));
+  // 과부하(503)는 잠깐 뒤 풀리는 경우가 많아 대기 시간을 늘려가며 최대 5라운드(모든 모델 순회)까지 재시도
+  for (let round = 0; round <= OVERLOAD_BACKOFF_MS.length && text === null; round++) {
+    if (round > 0) {
+      const wait = OVERLOAD_BACKOFF_MS[round - 1];
+      await new Promise((r) => setTimeout(r, wait + Math.random() * 1000));
+    }
     sawOverload = false;
     for (const model of queue) {
       const r = await callModel(model, key, body);
@@ -158,7 +176,7 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
 
   if (text === null) {
     if (sawOverload && !sawQuota)
-      throw new AppError('UNKNOWN', 'Gemini 서버가 일시적으로 혼잡해요(503). 잠시 후 다시 시도해주세요.');
+      throw new AppError('UNKNOWN', 'Gemini 서버가 혼잡해 여러 번 재시도했지만 실패했어요(503). 1~2분 뒤 다시 시도해주세요.');
     if (sawQuota)
       throw new AppError('GEMINI_QUOTA', '무료 사용량 한도에 도달했어요. 잠시 후 다시 시도해주세요.');
     // 요청 자체가 거부된 경우(모든 모델이 400/404)는 실제 사유를 보여줘서 원인을 알 수 있게 함

@@ -23,11 +23,10 @@ export default function RootLayout() {
   // 완료 알림을 누르면 미리보기로 이동
   useEffect(() => {
     return onNotificationTap(() => {
-      const { genStatus, dismissGeneration } = usePostStore.getState();
-      if (genStatus === 'done') {
-        dismissGeneration();
-        router.push('/(main)/preview');
-      }
+      const { genStatus, dismissGeneration, body } = usePostStore.getState();
+      // 다시 생성이 진행 중일 때 이전 완료 알림을 눌러도 (기존 글이 있으면) 미리보기로 이동
+      if (genStatus === 'done') dismissGeneration();
+      if (genStatus === 'done' || body.trim()) router.push('/(main)/preview');
     });
   }, []);
 
