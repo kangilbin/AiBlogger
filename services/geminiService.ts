@@ -15,6 +15,7 @@ const RESPONSE_SCHEMA = {
     title: { type: 'STRING' },
     body: { type: 'STRING' },
     labels: { type: 'ARRAY', items: { type: 'STRING' } },
+    alts: { type: 'ARRAY', items: { type: 'STRING' } },
   },
   required: ['title', 'body', 'labels'],
 };
@@ -83,6 +84,10 @@ async function callModel(model: string, key: string, body: object): Promise<Atte
     cooldown.set(model, Date.now() + COOLDOWN_MS);
     return { ok: false, next: true, reason: 'quota' };
   }
+  // 서버 과부하/일시 오류 → 다음 모델 시도 (모두 실패하면 generatePost에서 재시도)
+  if (res.status === 500 || res.status === 502 || res.status === 503 || res.status === 504) {
+    return { ok: false, next: true, reason: 'overloaded' };
+  }
   if (res.status === 404) return { ok: false, next: true, reason: 'missing', detail: `모델 ${model}을(를) 찾을 수 없어요.` };
 
   const j = await res.json().catch(() => null);
@@ -133,17 +138,27 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
   const queue = ready.length ? ready : all; // 모두 쿨다운이면 그래도 시도
 
   let sawQuota = false;
+  let sawOverload = false;
   let lastDetail: string | null = null;
   let text: string | null = null;
-  for (const model of queue) {
-    const r = await callModel(model, key, body);
-    if (r.ok) { text = r.text; break; }
-    if (!r.next) throw r.error;
-    if (r.reason === 'quota') sawQuota = true;
-    if (r.detail) lastDetail = r.detail;
+  // 과부하(503)는 잠깐 뒤 풀리는 경우가 많아 최대 3라운드까지 재시도
+  for (let round = 0; round < 3 && text === null; round++) {
+    if (round > 0) await new Promise((r) => setTimeout(r, 1500 * round));
+    sawOverload = false;
+    for (const model of queue) {
+      const r = await callModel(model, key, body);
+      if (r.ok) { text = r.text; break; }
+      if (!r.next) throw r.error;
+      if (r.reason === 'quota') sawQuota = true;
+      if (r.reason === 'overloaded') sawOverload = true;
+      if (r.detail) lastDetail = r.detail;
+    }
+    if (!sawOverload) break; // 과부하가 아니면 재시도해도 소용없음
   }
 
   if (text === null) {
+    if (sawOverload && !sawQuota)
+      throw new AppError('UNKNOWN', 'Gemini 서버가 일시적으로 혼잡해요(503). 잠시 후 다시 시도해주세요.');
     if (sawQuota)
       throw new AppError('GEMINI_QUOTA', '무료 사용량 한도에 도달했어요. 잠시 후 다시 시도해주세요.');
     // 요청 자체가 거부된 경우(모든 모델이 400/404)는 실제 사유를 보여줘서 원인을 알 수 있게 함
@@ -162,6 +177,8 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
     title: parsed.title?.trim() || input.placeName,
     body: normalizeBody(parsed.body ?? '', input.photos.length),
     labels: (parsed.labels ?? []).map((l) => l.replace(/^#/, '').trim()).filter(Boolean).slice(0, 6),
+    // 사진 수에 맞춰 정렬 (부족하면 빈 문자열 → 발행 시 메모/장소명으로 대체)
+    alts: input.photos.map((_, i) => (parsed.alts?.[i] ?? '').trim().slice(0, 120)),
   };
 }
 

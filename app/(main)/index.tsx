@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ import { BlogSwitcherTrigger, BlogDropdown } from '@/components/ui/BlogSwitcher'
 const STATUS: Record<PostHistory['publishStatus'], { label: string; tone: 'success' | 'warning' }> = {
   published: { label: '발행', tone: 'success' },
   draft: { label: '임시저장', tone: 'warning' },
+  generated: { label: '발행 전', tone: 'warning' },
 };
 
 /** 눌러서 이동하는 안내 카드 (작성 중인 글, 키 등록 등) */
@@ -44,6 +45,14 @@ export default function HomeScreen() {
   const user = useAuthStore((s) => s.user);
   const hasGeminiKey = useAuthStore((s) => s.hasGeminiKey);
   const hasDraft = usePostStore((s) => !!s.body && s.genStatus !== 'running');
+  const openDraft = (item: PostHistory) => {
+    if (!usePostStore.getState().loadFromHistory(item)) {
+      Alert.alert('글 작성 중', '다른 글을 AI가 작성하고 있어요. 완료된 뒤에 열어주세요.');
+      return;
+    }
+    router.push('/(main)/preview');
+  };
+  const resetForm = usePostStore((s) => s.resetForm);
   const draftPlace = usePostStore((s) => s.placeName);
   const history = useHistoryStore((s) => s.history);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -81,7 +90,7 @@ export default function HomeScreen() {
           />
         )}
 
-        <Button label="새 글 작성하기" onPress={() => router.push('/(main)/create')} fullWidth />
+        <Button label="새 글 작성하기" onPress={() => { if (usePostStore.getState().genStatus !== 'running') resetForm(); router.push('/(main)/create'); }} fullWidth />
 
         {history.length > 0 ? (
           <View style={styles.section}>
@@ -98,6 +107,11 @@ export default function HomeScreen() {
                 title={item.placeName}
                 subtitle={<RatingValue value={item.rating} />}
                 right={<Badge label={STATUS[item.publishStatus].label} tone={STATUS[item.publishStatus].tone} />}
+                onPress={
+                  item.publishStatus === 'generated'
+                    ? () => openDraft(item)
+                    : undefined
+                }
               />
             ))}
           </View>

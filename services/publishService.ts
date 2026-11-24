@@ -19,6 +19,8 @@ export interface PublishParams {
   title: string;
   body: string;
   labels: string[];
+  /** 사진별 AI 대체 텍스트 (없으면 사진 메모 → 장소명) */
+  alts?: string[];
   isDraft: boolean;
   onProgress?: (message: string) => void;
 }
@@ -54,7 +56,7 @@ export async function publishToBlogger(p: PublishParams): Promise<PublishResult>
   // 직접 수정하며 사진 마커가 지워졌어도 모든 사진이 게시되도록 보정
   const body = normalizeBody(p.body, p.photos.length);
   const title = p.title.trim() || p.placeName;
-  const html = toHtml(body, urls, p.photos.map((x) => x.note || p.placeName), p.mapTarget, p.photos.map((x, i) => i > 0 && !!x.joinPrev));
+  const html = toHtml(body, urls, p.photos.map((x, i) => p.alts?.[i] || x.note || p.placeName), p.mapTarget, p.photos.map((x, i) => i > 0 && !!x.joinPrev));
   const res = await createPost(p.blogId, { title, html, labels: p.labels, isDraft: p.isDraft });
 
   return { ...res, title, body, thumbnailUrl: urls[0] ?? '' };

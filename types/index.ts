@@ -40,9 +40,22 @@ export interface GeneratedPost {
   /** 본문. 문단은 빈 줄로 구분, `## ` 소제목, `[[사진N]]` 사진 위치 마커 */
   body: string;
   labels: string[];
+  /** 사진별 대체 텍스트(alt), 사진 순서대로. 검색 노출·접근성용 */
+  alts?: string[];
 }
 
-export type PublishStatus = 'draft' | 'published';
+/** generated: AI가 작성만 한 미발행 글(이어서 수정/발행 가능), draft: Blogger 임시글, published: 발행 */
+export type PublishStatus = 'generated' | 'draft' | 'published';
+
+/** 미발행 글을 그대로 다시 열기 위한 입력/사진 스냅샷 */
+export interface PostSnapshot {
+  photos: PhotoEntry[];
+  place: PlaceInfo | null;
+  showMap: boolean;
+  summary: string;
+  notes: string;
+  extraPrompt: string;
+}
 
 export interface PostHistory {
   id: string;
@@ -54,5 +67,9 @@ export interface PostHistory {
   labels: string[];
   publishStatus: PublishStatus;
   postUrl?: string;
+  /** 미발행(generated) 글을 이어서 편집할 때 복원하는 데이터 */
+  snapshot?: PostSnapshot;
+  /** 사진별 대체 텍스트 */
+  alts?: string[];
   createdAt: string;
 }

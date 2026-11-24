@@ -61,7 +61,7 @@ describe('지도 첨부', () => {
     expect(html).toContain('<iframe');
     expect(html).toContain('maps.google.com/maps?q=');
     expect(html).not.toContain('<b>');
-    expect(html.indexOf('<p>본문</p>')).toBeLessThan(html.indexOf('<iframe'));
+    expect(html.indexOf('>본문</p>')).toBeLessThan(html.indexOf('<iframe'));
   });
   it('map이 없으면 지도 없음', () => {
     expect(toHtml('본문', [])).not.toContain('iframe');
@@ -97,5 +97,47 @@ describe('지도 이름 특수문자', () => {
   const { mapEmbedQuery } = require('@/utils/postFormat');
   it('이름 속 괄호는 임베드 질의에서 제거된다', () => {
     expect(mapEmbedQuery({ label: '스타벅스 (성수점)', lat: 37.5, lng: 127.1 })).toBe('37.5,127.1(스타벅스 성수점)');
+  });
+});
+
+
+describe('소제목 줄바꿈', () => {
+  it('소제목 바로 아래 본문이 이어져도 소제목과 문단으로 분리된다', () => {
+    const { parseBody } = require('@/utils/postFormat');
+    expect(parseBody('## 제목\n본문 첫줄\n본문 둘째줄')).toEqual([
+      { type: 'heading', text: '제목' },
+      { type: 'paragraph', text: '본문 첫줄\n본문 둘째줄' },
+    ]);
+  });
+  it('normalizeBody가 소제목/마커 앞뒤에 빈 줄을 넣는다', () => {
+    const { normalizeBody } = require('@/utils/postFormat');
+    expect(normalizeBody('도입\n## 제목\n본문\n[[사진1]]\n마무리', 1)).toBe('도입\n\n## 제목\n\n본문\n\n[[사진1]]\n\n마무리');
+  });
+});
+
+
+describe('가벼운 마크업', () => {
+  const { parseBody, toHtml, normalizeBody } = require('@/utils/postFormat');
+  it('인용/목록/구분선을 블록으로 파싱한다', () => {
+    expect(parseBody('> 총평\n- a\n- b\n---\n본문')).toEqual([
+      { type: 'quote', text: '총평' },
+      { type: 'list', items: ['a', 'b'] },
+      { type: 'divider' },
+      { type: 'paragraph', text: '본문' },
+    ]);
+  });
+  it('**굵게**는 strong으로, HTML은 이스케이프된다', () => {
+    const html = toHtml('**메뉴** <b>x</b>', []);
+    expect(html).toContain('<strong>메뉴</strong>');
+    expect(html).toContain('&lt;b&gt;');
+  });
+  it('인용/목록/구분선 HTML이 만들어진다', () => {
+    const html = toHtml('> 총평\n\n- a\n- b\n\n---', []);
+    expect(html).toContain('<blockquote');
+    expect(html).toContain('<ul');
+    expect(html).toContain('<hr');
+  });
+  it('normalizeBody가 종류가 바뀌는 곳에 빈 줄을 넣는다', () => {
+    expect(normalizeBody('문단\n- a\n- b\n> q\n---\n끝', 0)).toBe('문단\n\n- a\n- b\n\n> q\n\n---\n\n끝');
   });
 });

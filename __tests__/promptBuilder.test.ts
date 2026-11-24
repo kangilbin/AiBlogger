@@ -28,7 +28,7 @@ describe('buildSystemPrompt', () => {
     expect(p).toContain('반말로 쓴다');
     expect(p).toContain('별점 2점');
     expect(p).toContain('[[사진N]]');
-    expect(p).toContain('10년간');
+    expect(p).not.toContain('10년');
     expect(p).toContain('지어내서는 안 됩니다');
   });
 });
@@ -68,5 +68,13 @@ describe('주소 전달', () => {
   });
   it('주소가 없으면 위치 줄이 없다', () => {
     expect(buildUserText(base)).not.toContain('위치(주소)');
+  });
+});
+
+
+describe('블로그 최적화 지침', () => {
+  const p = buildSystemPrompt(input);
+  it.each(['[제목 규칙]', '"alts"', '[글 구조]', '첫 문단'])('%s 를 포함한다', (k) => {
+    expect(p).toContain(k);
   });
 });

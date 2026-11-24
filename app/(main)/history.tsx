@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
-import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useHistoryStore } from '@/stores/historyStore';
+import { usePostStore } from '@/stores/postStore';
 import { Colors } from '@/constants/colors';
 import { Radius, Typo, SCREEN_PADDING } from '@/constants/styles';
 import type { PostHistory } from '@/types';
@@ -14,11 +15,14 @@ import { RatingValue } from '@/components/ui/StarRating';
 const STATUS: Record<PostHistory['publishStatus'], { label: string; tone: 'success' | 'warning' }> = {
   published: { label: '발행완료', tone: 'success' },
   draft: { label: '임시저장', tone: 'warning' },
+  generated: { label: '발행 전', tone: 'warning' },
 };
 
 export default function HistoryScreen() {
   const router = useRouter();
   const history = useHistoryStore((s) => s.history);
+  const remove = useHistoryStore((s) => s.remove);
+  const loadFromHistory = usePostStore((s) => s.loadFromHistory);
 
   const renderItem = useCallback(({ item }: { item: PostHistory }) => {
     const status = STATUS[item.publishStatus];
@@ -42,14 +46,27 @@ export default function HistoryScreen() {
           </View>
         }
         right={<Badge label={status.label} tone={status.tone} />}
-        chevron={!!item.postUrl}
-        onPress={item.postUrl ? () => router.push({
-          pathname: '/(main)/browser',
-          params: { url: item.postUrl, title: item.placeName },
-        }) : undefined}
+        chevron
+        onPress={() => {
+          if (item.publishStatus === 'generated') {
+            if (!loadFromHistory(item)) {
+              Alert.alert('글 작성 중', '다른 글을 AI가 작성하고 있어요. 완료된 뒤에 열어주세요.');
+              return;
+            }
+            router.push('/(main)/preview');
+          } else if (item.postUrl) {
+            router.push({ pathname: '/(main)/browser', params: { url: item.postUrl, title: item.placeName } });
+          }
+        }}
+        onLongPress={() =>
+          Alert.alert('이력 삭제', `'${item.placeName}' 기록을 삭제할까요?`, [
+            { text: '취소', style: 'cancel' },
+            { text: '삭제', style: 'destructive', onPress: () => remove(item.id) },
+          ])
+        }
       />
     );
-  }, [router]);
+  }, [router, loadFromHistory, remove]);
 
   return (
     <SafeAreaView style={styles.container}>

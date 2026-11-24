@@ -5,7 +5,7 @@ import {
   Alert, KeyboardAvoidingView, Platform, Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { usePostStore } from '@/stores/postStore';
@@ -50,6 +50,18 @@ export default function CreateScreen() {
   const presets = useMemo(() => useSettingsStore.getState().presets(), [overrides, custom]);
 
   const [placeError, setPlaceError] = useState<string | null>(null);
+
+  // 이미 글이 생성(이력에 저장)된 뒤 새 글 탭에 오면 입력을 모두 비워 새로 시작.
+  // 생성 중이거나 아직 결과가 없는 입력(실패 후 재시도 등)은 그대로 둔다.
+  useFocusEffect(
+    React.useCallback(() => {
+      const s = usePostStore.getState();
+      if (s.genStatus !== 'running' && s.body.trim()) {
+        s.resetForm();
+        setPlaceError(null);
+      }
+    }, [])
+  );
 
   const handlePickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -99,8 +111,8 @@ export default function CreateScreen() {
         <ScreenHeader title="새 블로그 글" onBack={() => router.back()} />
         <View style={styles.lockBox}>
           <Ionicons name="hourglass-outline" size={40} color={Colors.textDisabled} />
-          <Text style={styles.lockTitle}>글을 작성하고 있어요</Text>
-          <Text style={styles.lockDesc}>완료되면 상단에 알려드려요.{'\n'}그동안 다른 화면을 둘러보셔도 돼요.</Text>
+          <Text style={styles.lockTitle}>글 작성 중...</Text>
+          <Text style={styles.lockDesc}>완료되면 상단에 알려드려요.</Text>
         </View>
         <BottomBar>
           <Button label="홈으로" variant="secondary" onPress={() => router.replace('/(main)')} fullWidth />

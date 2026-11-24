@@ -13,6 +13,7 @@ interface Props {
   /** 오른쪽 값/요소 */
   right?: React.ReactNode;
   onPress?: () => void;
+  onLongPress?: () => void;
   /** 오른쪽 > 화살표 (기본: onPress가 있으면 표시) */
   chevron?: boolean;
   danger?: boolean;
@@ -20,10 +21,10 @@ interface Props {
 }
 
 /** 토스식 리스트 한 줄: [left] 제목/부제목 ........ [right] > */
-export function ListRow({ title, subtitle, left, right, onPress, chevron, danger, titleLines = 1 }: Props) {
+export function ListRow({ title, subtitle, left, right, onPress, onLongPress, chevron, danger, titleLines = 1 }: Props) {
   const showChevron = chevron ?? !!onPress;
   return (
-    <Touchable style={styles.row} onPress={onPress} disabled={!onPress} pressScale={1} activeOpacity={0.5}>
+    <Touchable style={styles.row} onPress={onPress} onLongPress={onLongPress} disabled={!onPress && !onLongPress} pressScale={1} activeOpacity={0.5}>
       {left}
       <View style={styles.body}>
         <Text style={[styles.title, danger && styles.danger]} numberOfLines={titleLines}>{title}</Text>
