@@ -4,6 +4,7 @@ import { publishToBlogger, clearUploadCache } from '@/services/publishService';
 import { clearImageCache } from '@/services/imageUtils';
 import { errorMessage, AppError } from '@/services/errors';
 import { ensureNotificationPermission, notifyIfBackground } from '@/services/notificationService';
+import { joinPhotoTo, removePhotoAt, moveGroup } from '@/utils/photoGroup';
 import { useSettingsStore } from './settingsStore';
 import { useAuthStore } from './authStore';
 import { useHistoryStore } from './historyStore';
@@ -41,6 +42,8 @@ interface PostState {
   movePhoto: (index: number, dir: -1 | 1) => void;
   setPhotoNote: (index: number, note: string) => void;
   setPhotoJoin: (index: number, join: boolean) => void;
+  /** from 사진을 to 사진의 묶음으로 옮김 (드래그앤드랍) */
+  joinPhoto: (from: number, to: number) => void;
   setField: (patch: Partial<Pick<PostState, 'placeName' | 'place' | 'showMap' | 'rating' | 'summary' | 'notes' | 'extraPrompt' | 'title' | 'body'>>) => void;
 
   startGeneration: () => void;
@@ -78,15 +81,9 @@ export const usePostStore = create<PostState>((set, get) => ({
 
   addPhotos: (uris) =>
     set((s) => ({ photos: [...s.photos, ...uris.map((uri) => ({ uri, note: '' }))] })),
-  removePhoto: (index) => set((s) => ({ photos: s.photos.filter((_, i) => i !== index) })),
-  movePhoto: (index, dir) =>
-    set((s) => {
-      const to = index + dir;
-      if (to < 0 || to >= s.photos.length) return s;
-      const next = [...s.photos];
-      [next[index], next[to]] = [next[to], next[index]];
-      return { photos: next };
-    }),
+  removePhoto: (index) => set((s) => ({ photos: removePhotoAt(s.photos, index) })),
+  movePhoto: (index, dir) => set((s) => ({ photos: moveGroup(s.photos, index, dir) })),
+  joinPhoto: (from, to) => set((s) => ({ photos: joinPhotoTo(s.photos, from, to) })),
   setPhotoNote: (index, note) =>
     set((s) => ({ photos: s.photos.map((p, i) => (i === index ? { ...p, note } : p)) })),
   setPhotoJoin: (index, join) =>

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import {
   View, Text, TextInput, ScrollView, StyleSheet,
@@ -23,17 +23,20 @@ import { Touchable } from '@/components/ui/Touchable';
 
 export default function CreateScreen() {
   const router = useRouter();
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollYRef = useRef(0);
+  const [dragging, setDragging] = useState(false);
   const hasGeminiKey = useAuthStore((s) => s.hasGeminiKey);
   // 필요한 값만 구독해 입력 중 불필요한 전체 리렌더를 줄임
   const {
     photos, placeName, place, showMap, rating, summary, notes, extraPrompt, genStatus,
-    addPhotos, removePhoto, movePhoto, setPhotoNote, setPhotoJoin, setField, startGeneration,
+    addPhotos, removePhoto, movePhoto, setPhotoNote, setPhotoJoin, joinPhoto, setField, startGeneration,
   } = usePostStore(
     useShallow((s) => ({
       photos: s.photos, placeName: s.placeName, place: s.place, showMap: s.showMap, rating: s.rating,
       summary: s.summary, notes: s.notes, extraPrompt: s.extraPrompt, genStatus: s.genStatus,
       addPhotos: s.addPhotos, removePhoto: s.removePhoto, movePhoto: s.movePhoto, setPhotoNote: s.setPhotoNote,
-      setPhotoJoin: s.setPhotoJoin, setField: s.setField, startGeneration: s.startGeneration,
+      setPhotoJoin: s.setPhotoJoin, joinPhoto: s.joinPhoto, setField: s.setField, startGeneration: s.startGeneration,
     }))
   );
   const selectedId = useSettingsStore((s) => s.selectedId);
@@ -106,11 +109,11 @@ export default function CreateScreen() {
       <ScreenHeader title="새 블로그 글" onBack={() => router.back()} />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScrollView ref={scrollRef} scrollEnabled={!dragging} scrollEventThrottle={16} onScroll={(e) => { scrollYRef.current = e.nativeEvent.contentOffset.y; }} style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>사진 <Text style={styles.required}>*</Text></Text>
-            <Text style={styles.hint}>글에 들어갈 순서대로 추가하세요. 같은 음식 사진처럼 한꺼번에 보여주고 싶으면 '이전 사진과 묶기'를 누르세요. 사진마다 메모를 남기면 AI가 맥락에 맞춰 써줘요.</Text>
-            <PhotoList photos={photos} maxCount={MAX_PHOTOS} onAdd={handlePickImage} onRemove={removePhoto} onMove={movePhoto} onNote={setPhotoNote} onJoin={setPhotoJoin} />
+            <Text style={styles.hint}>글에 들어갈 순서대로 추가하세요. 같은 음식 사진처럼 한꺼번에 보여주고 싶으면 사진을 길게 눌러 묶을 사진 위로 끌어다 놓으세요. 묶인 사진은 한 줄로 보여요. 사진마다 메모를 남기면 AI가 맥락에 맞춰 써줘요.</Text>
+            <PhotoList photos={photos} maxCount={MAX_PHOTOS} onAdd={handlePickImage} onRemove={removePhoto} onMove={movePhoto} onNote={setPhotoNote} onJoin={setPhotoJoin} onGroup={joinPhoto} onDragChange={setDragging} scrollRef={scrollRef} scrollYRef={scrollYRef} />
           </View>
 
           <View style={styles.section}>
