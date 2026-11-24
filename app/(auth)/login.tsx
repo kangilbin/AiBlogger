@@ -34,7 +34,7 @@ export default function LoginScreen() {
         <View style={styles.hero}>
           <Text style={styles.brand}>AI Bloger</Text>
           <Text style={Typo.display}>사진만 올리면{'\n'}블로그 글이 완성돼요</Text>
-          <Text style={styles.sub}>방문한 곳의 사진과 별점만 남기세요.{'\n'}글쓰기는 AI가 대신해요.</Text>
+          <Text style={styles.sub}>방문한 곳의 사진과 별점만 남기세요.{'\n'}글쓰기는 AI가 대신합니다.</Text>
         </View>
 
         <View style={styles.actions}>

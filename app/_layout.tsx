@@ -51,11 +51,16 @@ export default function RootLayout() {
   return (
     <View style={{ flex: 1 }}>
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(main)" />
-      <Stack.Screen name="settings" />
-      <Stack.Screen name="prompts" />
-      <Stack.Screen name="gemini-guide" />
+      {/* 로그인 + 블로그 선택 전에는 홈 등 메인 화면이 아예 마운트되지 않도록 가드 */}
+      <Stack.Protected guard={isInitialized && !(isLoggedIn && blog)}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+      <Stack.Protected guard={isInitialized && isLoggedIn && !!blog}>
+        <Stack.Screen name="(main)" />
+        <Stack.Screen name="settings" />
+        <Stack.Screen name="prompts" />
+        <Stack.Screen name="gemini-guide" />
+      </Stack.Protected>
     </Stack>
     <GenerationBanner />
     {showSplash && (

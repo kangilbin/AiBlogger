@@ -10,19 +10,20 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFFFFF"
+      "backgroundColor": "#7C5CFA"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.aibloger.app",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "블로그 글에 첨부할 사진을 선택하기 위해 사진 라이브러리에 접근합니다."
+        "NSPhotoLibraryUsageDescription": "블로그 글에 첨부할 사진을 선택하기 위해 사진 라이브러리에 접근합니다.",
+        "NSLocalNetworkUsageDescription": "개발 중 컴퓨터의 개발 서버에 연결하기 위해 로컬 네트워크에 접근합니다."
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#7C5CFA"
       },
       "package": "com.aibloger.app",
       "permissions": [
@@ -45,7 +46,7 @@
       "expo-web-browser",
       "expo-asset",
       "expo-font",
-      "expo-notifications",
+      "./plugins/withoutPushEntitlement",
       [
         "@react-native-google-signin/google-signin",
         {
