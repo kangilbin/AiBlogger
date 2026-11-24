@@ -38,7 +38,7 @@ export default function BrowserScreen() {
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={styles.headerBtn}
         >
-          <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
+          <Ionicons name="chevron-back" size={26} color={Colors.textPrimary} />
         </Touchable>
 
         <View style={styles.headerCenter}>
@@ -96,15 +96,13 @@ export default function BrowserScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.white },
+  container: { flex: 1, backgroundColor: Colors.bg },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 10,
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    paddingHorizontal: 12,
+    height: 56,
+    backgroundColor: Colors.bg,
     gap: 4,
   },
   headerBtn: {
@@ -120,13 +118,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   headerTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '700',
     color: Colors.textPrimary,
   },
   headerUrl: {
-    fontSize: 11,
-    color: Colors.textSecondary,
+    fontSize: 12,
+    color: Colors.textTertiary,
   },
   headerRight: {
     flexDirection: 'row',
@@ -134,7 +132,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 2,
-    backgroundColor: Colors.border,
+    backgroundColor: Colors.fill,
   },
   progressFill: {
     height: 2,
@@ -146,6 +144,6 @@ const styles = StyleSheet.create({
     top: 0, left: 0, right: 0, bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.bg,
   },
 });

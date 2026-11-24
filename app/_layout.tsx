@@ -68,5 +68,5 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
-  splash: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.white, alignItems: 'center', justifyContent: 'center' },
+  splash: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.bg, alignItems: 'center', justifyContent: 'center' },
 });

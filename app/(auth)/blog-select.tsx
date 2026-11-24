@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Linking, AppState } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Linking, AppState } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -8,8 +8,11 @@ import { errorMessage } from '@/services/errors';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
+import { Radius, Typo } from '@/constants/styles';
+import { ListRow } from '@/components/ui/ListRow';
+import { BottomBar } from '@/components/ui/BottomBar';
 import type { BlogInfo } from '@/types';
-import { Touchable } from '@/components/ui/Touchable';
+import { ScreenHeader } from '@/components/layout/ScreenHeader';
 
 export default function BlogSelectScreen() {
   const router = useRouter();
@@ -47,15 +50,15 @@ export default function BlogSelectScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {/* 설정에서 들어온 경우(돌아갈 화면이 있고 이미 블로그가 선택됨)에만 닫기 버튼 표시 */}
-      {blog && router.canGoBack() && (
-        <Touchable style={styles.back} onPress={() => router.back()} accessibilityLabel="닫기">
-          <Ionicons name="chevron-back" size={26} color={Colors.textPrimary} />
-        </Touchable>
+      {blog && router.canGoBack() ? (
+        <ScreenHeader onBack={() => router.back()} />
+      ) : (
+        <View style={{ height: 56 }} />
       )}
-      <View style={styles.body}>
-        <Text style={styles.title}>글을 올릴 블로그를{'\n'}선택해주세요</Text>
+      <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
+        <Text style={Typo.display}>글을 올릴 블로그를{'\n'}선택해주세요</Text>
         {loading ? (
-          <ActivityIndicator color={Colors.primary} style={{ marginTop: 40 }} />
+          <ActivityIndicator color={Colors.primary} style={{ marginTop: 48 }} />
         ) : error ? (
           <View style={styles.box}>
             <Text style={styles.err}>{error}</Text>
@@ -63,59 +66,53 @@ export default function BlogSelectScreen() {
           </View>
         ) : blogs.length === 0 ? (
           <View style={styles.box}>
-            <Text style={styles.emptyTitle}>아직 Blogger 블로그가 없어요</Text>
+            <Text style={Typo.heading}>아직 Blogger 블로그가 없어요</Text>
             <Text style={styles.desc}>
-              블로그는 Blogger에서만 만들 수 있어요(앱에서는 만들 수 없어요). 1분이면 끝나요.
+              블로그는 Blogger에서만 만들 수 있어요. 1분이면 끝나요.
             </Text>
             <View style={styles.steps}>
               <Text style={styles.step}>1. 아래 버튼으로 Blogger를 열고 같은 구글 계정으로 로그인</Text>
               <Text style={styles.step}>2. "블로그 만들기"에서 제목과 주소(영문)를 정하고 완료</Text>
               <Text style={styles.step}>3. 이 앱으로 돌아오면 자동으로 불러와요</Text>
             </View>
-            <Button label="Blogger에서 블로그 만들기" onPress={() => Linking.openURL('https://www.blogger.com')} fullWidth />
             <Button label="새로고침" variant="secondary" onPress={() => load()} fullWidth />
           </View>
         ) : (
-          <View style={{ gap: 10, marginTop: 24 }}>
+          <View style={{ marginTop: 20 }}>
             {blogs.map((b) => (
-              <Touchable key={b.id} style={[styles.item, blog?.id === b.id && styles.itemOn]} onPress={() => pick(b)} activeOpacity={0.7}>
-                <Text style={styles.name}>{b.name}</Text>
-                <Text style={styles.url} numberOfLines={1}>{b.url}</Text>
-              </Touchable>
+              <ListRow
+                key={b.id}
+                title={b.name}
+                subtitle={b.url.replace(/^https?:\/\//, '')}
+                right={blog?.id === b.id ? <Ionicons name="checkmark-circle" size={24} color={Colors.primary} /> : undefined}
+                chevron={false}
+                onPress={() => pick(b)}
+              />
             ))}
-            <Button
-              label="+ Blogger에서 새 블로그 만들기"
-              variant="secondary"
-              onPress={() => Linking.openURL('https://www.blogger.com')}
-              fullWidth
-              style={{ marginTop: 6 }}
-            />
-            <Text style={styles.hint}>만든 뒤 앱으로 돌아오면 목록에 자동으로 나타나요.</Text>
+            <Text style={styles.hint}>새 블로그를 만든 뒤 앱으로 돌아오면 목록에 자동으로 나타나요.</Text>
           </View>
         )}
-      </View>
-      <View style={styles.footer}>
+      </ScrollView>
+      <BottomBar>
+        <Button
+          label={blogs.length === 0 && !loading && !error ? 'Blogger에서 블로그 만들기' : 'Blogger에서 새 블로그 만들기'}
+          variant={blogs.length === 0 && !loading && !error ? 'primary' : 'secondary'}
+          onPress={() => Linking.openURL('https://www.blogger.com')}
+          fullWidth
+        />
         <Button label="다른 계정으로 로그인" variant="ghost" onPress={logout} fullWidth />
-      </View>
+      </BottomBar>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.white },
-  back: { paddingHorizontal: 16, paddingTop: 8, alignSelf: 'flex-start' },
-  body: { flex: 1, padding: 24 },
-  title: { fontSize: 24, fontWeight: '700', color: Colors.textPrimary, lineHeight: 34, marginTop: 24 },
-  box: { gap: 12, marginTop: 32 },
-  emptyTitle: { fontSize: 17, fontWeight: '700', color: Colors.textPrimary },
-  steps: { gap: 8, backgroundColor: Colors.background, borderRadius: 12, padding: 14 },
-  step: { fontSize: 14, color: Colors.textPrimary, lineHeight: 21 },
-  hint: { fontSize: 12, color: Colors.textDisabled, textAlign: 'center' },
-  desc: { fontSize: 15, color: Colors.textSecondary, lineHeight: 24 },
-  err: { fontSize: 14, color: Colors.error },
-  item: { padding: 16, borderRadius: 14, borderWidth: 1.5, borderColor: Colors.border, gap: 4 },
-  itemOn: { borderColor: Colors.primary, backgroundColor: Colors.primaryLight },
-  name: { fontSize: 16, fontWeight: '600', color: Colors.textPrimary },
-  url: { fontSize: 13, color: Colors.textSecondary },
-  footer: { padding: 24 },
+  container: { flex: 1, backgroundColor: Colors.bg },
+  body: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 24 },
+  box: { gap: 14, marginTop: 28 },
+  steps: { gap: 8, backgroundColor: Colors.fill, borderRadius: Radius.md, padding: 16 },
+  step: { ...Typo.body, lineHeight: 22 },
+  hint: { ...Typo.caption, color: Colors.textTertiary, marginTop: 12 },
+  desc: { ...Typo.body, color: Colors.textSecondary },
+  err: { ...Typo.body, color: Colors.error },
 });

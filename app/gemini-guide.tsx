@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, ScrollView, StyleSheet, Alert, Linking,
+  View, Text, ScrollView, StyleSheet, Alert, Linking,
   KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,6 +14,10 @@ import { errorMessage } from '@/services/errors';
 import { ScreenHeader } from '@/components/layout/ScreenHeader';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
+import { Radius, Typo, SCREEN_PADDING } from '@/constants/styles';
+import { TextField } from '@/components/ui/TextField';
+import { Field } from '@/components/ui/Field';
+import { BottomBar } from '@/components/ui/BottomBar';
 import { Touchable } from '@/components/ui/Touchable';
 
 const AI_STUDIO_URL = 'https://aistudio.google.com/app/apikey';
@@ -80,89 +84,82 @@ export default function GeminiGuideScreen() {
     <SafeAreaView style={styles.container}>
       <ScreenHeader title="Gemini 키 등록" onBack={() => router.back()} />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={styles.intro}>
-            <Text style={styles.introTitle}>AI가 글을 쓰려면 키가 필요해요</Text>
+            <Text style={Typo.display}>AI가 글을 쓰려면{'\n'}키가 필요해요</Text>
             <Text style={styles.introDesc}>
-              글을 쓰는 AI(Gemini)를 쓰려면 내 구글 계정으로 발급한 API 키가 필요해요. 발급은 무료이고, 한 번만 등록하면 계속 쓸 수 있어요.
-              {hasKey ? '\n(이미 등록된 키가 있어요. 새 키를 등록하면 교체돼요.)' : ''}
+              내 구글 계정으로 발급한 Gemini API 키가 필요해요. 발급은 무료이고, 한 번만 등록하면 계속 쓸 수 있어요.
+              {hasKey ? '\n이미 등록된 키가 있어요. 새 키를 등록하면 교체돼요.' : ''}
             </Text>
           </View>
 
-          {STEPS.map((st, i) => (
-            <View key={st.title} style={styles.step}>
-              <View style={styles.num}><Text style={styles.numText}>{i + 1}</Text></View>
-              <View style={{ flex: 1, gap: 4 }}>
-                <Text style={styles.stepTitle}>{st.title}</Text>
-                <Text style={styles.stepDesc}>{st.desc}</Text>
-                {i === 0 && (
-                  <Button label="AI Studio 열기" variant="secondary" onPress={() => Linking.openURL(AI_STUDIO_URL)} style={styles.inlineBtn} />
-                )}
+          <View style={{ gap: 20 }}>
+            {STEPS.map((st, i) => (
+              <View key={st.title} style={styles.step}>
+                <View style={styles.num}><Text style={styles.numText}>{i + 1}</Text></View>
+                <View style={{ flex: 1, gap: 4 }}>
+                  <Text style={styles.stepTitle}>{st.title}</Text>
+                  <Text style={Typo.caption}>{st.desc}</Text>
+                  {i === 0 && (
+                    <Button label="AI Studio 열기" variant="secondary" size="md" onPress={() => Linking.openURL(AI_STUDIO_URL)} style={styles.inlineBtn} />
+                  )}
+                </View>
               </View>
-            </View>
-          ))}
+            ))}
+          </View>
 
-          <View style={styles.form}>
-            <Text style={styles.label}>Gemini API 키</Text>
+          <Field label="Gemini API 키" error={error}>
             <View style={styles.inputWrap}>
-              <TextInput
-                style={[styles.input, styles.inputFlex, error && styles.inputError]}
+              <TextField
+                style={styles.inputFlex}
+                error={!!error}
                 value={key}
                 onChangeText={(t) => { setKey(t); setError(null); }}
                 placeholder="여기에 키를 붙여넣으세요"
-                placeholderTextColor={Colors.textDisabled}
                 autoCapitalize="none"
                 autoCorrect={false}
                 secureTextEntry={!show}
                 multiline={false}
               />
               <Touchable style={styles.eye} onPress={() => setShow((v) => !v)} accessibilityLabel={show ? '키 숨기기' : '키 보기'}>
-                <Ionicons name={show ? 'eye-off-outline' : 'eye-outline'} size={20} color={Colors.textSecondary} />
+                <Ionicons name={show ? 'eye-off-outline' : 'eye-outline'} size={20} color={Colors.textTertiary} />
               </Touchable>
             </View>
-            {error ? <Text style={styles.error}>{error}</Text> : null}
-            <View style={styles.row}>
-              <Button label="붙여넣기" variant="secondary" onPress={paste} style={{ flex: 1 }} />
-              <Button label="확인하고 저장" onPress={save} loading={busy} disabled={!key.trim()} style={{ flex: 2 }} />
-            </View>
-          </View>
+          </Field>
 
-          <Text style={styles.faqHeader}>자주 묻는 질문</Text>
-          {FAQ.map((f) => (
-            <View key={f.q} style={styles.faq}>
-              <Text style={styles.q}>{f.q}</Text>
-              <Text style={styles.a}>{f.a}</Text>
-            </View>
-          ))}
+          <View style={{ gap: 10 }}>
+            <Text style={Typo.heading}>자주 묻는 질문</Text>
+            {FAQ.map((f) => (
+              <View key={f.q} style={styles.faq}>
+                <Text style={styles.q}>{f.q}</Text>
+                <Text style={Typo.caption}>{f.a}</Text>
+              </View>
+            ))}
+          </View>
         </ScrollView>
+
+        <BottomBar row>
+          <Button label="붙여넣기" variant="secondary" onPress={paste} style={{ flex: 1 }} />
+          <Button label="확인하고 저장" onPress={save} loading={busy} disabled={!key.trim()} style={{ flex: 2 }} />
+        </BottomBar>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  content: { padding: 20, gap: 14, paddingBottom: 48 },
-  intro: { gap: 6, marginBottom: 4 },
-  introTitle: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary },
-  introDesc: { fontSize: 14, color: Colors.textSecondary, lineHeight: 22 },
-  step: { flexDirection: 'row', gap: 12, backgroundColor: Colors.white, borderRadius: 14, padding: 14 },
-  num: { width: 26, height: 26, borderRadius: 13, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
-  numText: { color: Colors.white, fontWeight: '700', fontSize: 13 },
-  stepTitle: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
-  stepDesc: { fontSize: 13, color: Colors.textSecondary, lineHeight: 20 },
-  inlineBtn: { alignSelf: 'flex-start', height: 38, paddingHorizontal: 18, marginTop: 6 },
+  container: { flex: 1, backgroundColor: Colors.bg },
+  content: { paddingHorizontal: SCREEN_PADDING, paddingTop: 8, paddingBottom: 32, gap: 32 },
+  intro: { gap: 12 },
+  introDesc: { ...Typo.body, fontSize: 16, color: Colors.textSecondary },
+  step: { flexDirection: 'row', gap: 14 },
+  num: { width: 28, height: 28, borderRadius: 14, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
+  numText: { color: Colors.primary, fontWeight: '700', fontSize: 14 },
+  stepTitle: { ...Typo.body, fontSize: 16, fontWeight: '600', marginTop: 3 },
+  inlineBtn: { alignSelf: 'flex-start', marginTop: 8 },
   inputWrap: { justifyContent: 'center' },
   inputFlex: { paddingRight: 48 },
   eye: { position: 'absolute', right: 8, padding: 8 },
-  form: { gap: 8, marginTop: 6 },
-  label: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
-  input: { backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.border, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, color: Colors.textPrimary },
-  inputError: { borderColor: Colors.error },
-  error: { fontSize: 12, color: Colors.error, lineHeight: 18 },
-  row: { flexDirection: 'row', gap: 10 },
-  faqHeader: { fontSize: 14, fontWeight: '700', color: Colors.textSecondary, marginTop: 18 },
-  faq: { backgroundColor: Colors.white, borderRadius: 14, padding: 14, gap: 4 },
-  q: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary },
-  a: { fontSize: 13, color: Colors.textSecondary, lineHeight: 20 },
+  faq: { backgroundColor: Colors.fill, borderRadius: Radius.md, padding: 16, gap: 6 },
+  q: { ...Typo.body, fontWeight: '600' },
 });

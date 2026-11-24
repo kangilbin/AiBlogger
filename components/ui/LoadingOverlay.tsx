@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet, Modal } from 'react-native';
 import { Colors } from '@/constants/colors';
+import { Radius } from '@/constants/styles';
 
 interface LoadingOverlayProps {
   visible: boolean;
@@ -24,13 +25,13 @@ export function LoadingOverlay({ visible, message = 'AI가 글을 작성하고 �
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: Colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
   },
   box: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
+    backgroundColor: Colors.bg,
+    borderRadius: Radius.lg,
     paddingVertical: 36,
     paddingHorizontal: 40,
     alignItems: 'center',
@@ -38,13 +39,13 @@ const styles = StyleSheet.create({
     minWidth: 220,
   },
   message: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     color: Colors.textPrimary,
     textAlign: 'center',
   },
   sub: {
-    fontSize: 13,
-    color: Colors.textSecondary,
+    fontSize: 14,
+    color: Colors.textTertiary,
   },
 });

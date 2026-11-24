@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert, Image, Pressable, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { signInWithGoogle } from '@/services/authService';
 import { IS_MOCK } from '@/constants/config';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/Button';
 import { Colors } from '@/constants/colors';
+import { Radius, Typo } from '@/constants/styles';
 import { MOCK_USER } from '@/services/mock/data';
 
 export default function LoginScreen() {
@@ -32,13 +32,9 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.hero}>
-          <View style={styles.logoBox}>
-            <Ionicons name="pencil" size={36} color={Colors.primary} />
-          </View>
-          <Text style={styles.appName}>AI Bloger</Text>
-          <Text style={styles.tagline}>
-            사진 찍고,{'\n'}블로그 글은 AI에게
-          </Text>
+          <Text style={styles.brand}>AI Bloger</Text>
+          <Text style={Typo.display}>사진만 올리면{'\n'}블로그 글이 완성돼요</Text>
+          <Text style={styles.sub}>방문한 곳의 사진과 별점만 남기세요.{'\n'}글쓰기는 AI가 대신해요.</Text>
         </View>
 
         <View style={styles.actions}>
@@ -48,30 +44,25 @@ export default function LoginScreen() {
             style={({ pressed }) => [
               styles.googleBtn,
               IS_MOCK && { opacity: 0.5 },
-              pressed && { backgroundColor: '#F1F3F4', transform: [{ scale: 0.97 }] },
+              pressed && { opacity: 0.7, transform: [{ scale: 0.98 }] },
             ]}
             accessibilityRole="button"
             accessibilityLabel="Google 계정으로 로그인"
           >
             {loading ? (
-              <ActivityIndicator color="#3C4043" />
+              <ActivityIndicator color={Colors.googleText} />
             ) : (
               <>
                 <Image source={require('@/assets/google-g.png')} style={styles.googleIcon} />
-                <Text style={styles.googleText}>Google 계정으로 로그인</Text>
+                <Text style={styles.googleText}>Google 계정으로 시작하기</Text>
               </>
             )}
           </Pressable>
           {IS_MOCK && (
-            <Button
-              label="개발 모드 로그인"
-              variant="secondary"
-              onPress={handleMockLogin}
-              fullWidth
-            />
+            <Button label="개발 모드 로그인" variant="secondary" onPress={handleMockLogin} fullWidth />
           )}
           <Text style={styles.legal}>
-            Blogger 글 발행과 사진 저장(Google Drive) 권한을 요청합니다.{'\n'}앱이 만든 파일 외에는 접근하지 않아요.
+            Blogger 글 발행과 사진 저장(Google Drive) 권한을 요청해요.{'\n'}앱이 만든 파일 외에는 접근하지 않아요.
           </Text>
         </View>
       </View>
@@ -80,58 +71,24 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.white },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: 'space-between',
-    paddingBottom: 40,
-  },
-  hero: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  logoBox: {
-    width: 76,
-    height: 76,
-    borderRadius: 22,
-    backgroundColor: Colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  appName: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  tagline: {
-    fontSize: 17,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 26,
-  },
+  container: { flex: 1, backgroundColor: Colors.bg },
+  content: { flex: 1, paddingHorizontal: 20, paddingBottom: 12 },
+  hero: { flex: 1, justifyContent: 'center', gap: 12, paddingBottom: 40 },
+  brand: { ...Typo.heading, color: Colors.primary },
+  sub: { ...Typo.body, fontSize: 16, color: Colors.textSecondary, marginTop: 4 },
   actions: { gap: 10 },
   googleBtn: {
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#FFFFFF',
+    height: 56,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.bg,
     borderWidth: 1,
-    borderColor: '#DADCE0',
+    borderColor: Colors.googleBorder,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 12,
   },
   googleIcon: { width: 22, height: 22 },
-  googleText: { fontSize: 16, fontWeight: '600', color: '#3C4043' },
-  legal: {
-    fontSize: 12,
-    color: Colors.textDisabled,
-    textAlign: 'center',
-    lineHeight: 18,
-    marginTop: 4,
-  },
+  googleText: { fontSize: 17, fontWeight: '600', color: Colors.googleText },
+  legal: { ...Typo.caption, color: Colors.textTertiary, textAlign: 'center', marginTop: 6 },
 });

@@ -1,24 +1,38 @@
+/** 팔레트: 연보라 브랜드 컬러 하나 + 보라 기운 도는 뉴트럴 + 의미색(성공/경고/오류) */
 export const Colors = {
-  primary: '#3182F6',
-  primaryLight: '#EBF3FF',
-  primaryDark: '#1A6CE8',
+  // Brand
+  primary: '#7C5CFA',
+  primaryPressed: '#6746E6',
+  primaryLight: '#F0ECFF',
 
-  white: '#FFFFFF',
-  background: '#F9FAFB',
-  surface: '#FFFFFF',
-  border: '#E5E8EB',
-  divider: '#F2F4F6',
+  // Surface — 화면은 흰색, 카드·입력창은 회색 채움(테두리 없음)
+  bg: '#FFFFFF',
+  fill: '#F4F3F8',
+  fillStrong: '#E6E3F0',
+  border: '#E6E3F0',
+  overlay: 'rgba(0,0,0,0.5)',
 
-  textPrimary: '#191F28',
-  textSecondary: '#8B95A1',
-  textTertiary: '#C9CDD2',
-  textDisabled: '#C9CDD2',
+  // Text
+  textPrimary: '#1F1B2E',
+  textSecondary: '#6C6880',
+  textTertiary: '#908CA4',
+  textDisabled: '#BAB7CA',
   textInverse: '#FFFFFF',
 
-  success: '#00C471',
-  warning: '#FF8A00',
+  // Semantic
+  success: '#03B26C',
+  successLight: '#E6F8F0',
+  warning: '#F59E0B',
+  warningLight: '#FFF5E0',
   error: '#F04452',
+  errorLight: '#FFEBEE',
 
-  star: '#FFC940',
-  starEmpty: '#E5E8EB',
+  star: '#FFB800',
+
+  // 토스트/다크 요소
+  toast: '#2E2A40',
+
+  // Google 로그인 버튼 (브랜드 가이드라인 색)
+  googleText: '#3C4043',
+  googleBorder: '#DADCE0',
 } as const;

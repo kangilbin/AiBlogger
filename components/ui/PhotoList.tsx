@@ -5,6 +5,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/constants/colors';
+import { Radius } from '@/constants/styles';
 import type { PhotoEntry } from '@/types';
 import { Touchable } from '@/components/ui/Touchable';
 import { groupsOf } from '@/utils/photoGroup';
@@ -217,7 +218,7 @@ export function PhotoList({
           <Image source={{ uri: p.uri }} style={styles.thumb} />
           <View style={styles.badge}><Text style={styles.badgeText}>{i + 1}</Text></View>
           <Touchable onPress={() => onRemove(i)} style={styles.removeBtn} hitSlop={6} accessibilityLabel="사진 삭제">
-            <Ionicons name="close" size={14} color={Colors.white} />
+            <Ionicons name="close" size={14} color={Colors.textInverse} />
           </Touchable>
         </View>
       </Animated.View>
@@ -290,7 +291,7 @@ export function PhotoList({
       })}
       {photos.length < maxCount && (
         <Touchable style={styles.add} onPress={onAdd} activeOpacity={0.7}>
-          <Ionicons name="add" size={22} color={Colors.textSecondary} />
+          <Ionicons name="add" size={22} color={Colors.primary} />
           <Text style={styles.addLabel}>사진 추가 ({photos.length}/{maxCount})</Text>
         </Touchable>
       )}
@@ -300,25 +301,25 @@ export function PhotoList({
 
 const styles = StyleSheet.create({
   wrap: { gap: 10 },
-  card: { backgroundColor: Colors.white, borderRadius: 14, padding: 10, gap: 8, borderWidth: 1, borderColor: Colors.border },
-  cardJoined: { borderLeftWidth: 4, borderLeftColor: Colors.primary },
+  card: { backgroundColor: Colors.fill, borderRadius: Radius.md, padding: 12, gap: 10 },
+  cardJoined: { backgroundColor: Colors.primaryLight },
   cardRaised: { zIndex: 20, elevation: 8 },
   thumbRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   thumbWrap: { zIndex: 1 },
-  thumbBox: { width: THUMB, height: THUMB, borderRadius: 10, borderWidth: 3, borderColor: 'transparent' },
+  thumbBox: { width: THUMB, height: THUMB, borderRadius: Radius.sm, borderWidth: 3, borderColor: 'transparent' },
   thumbHover: { borderColor: Colors.primary },
-  thumb: { width: '100%', height: '100%', borderRadius: 7 },
+  thumb: { width: '100%', height: '100%', borderRadius: 9 },
   badge: { position: 'absolute', top: 2, left: 2, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
-  badgeText: { color: Colors.white, fontSize: 11, fontWeight: '700' },
-  removeBtn: { position: 'absolute', top: 2, right: 2, width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center' },
+  badgeText: { color: Colors.textInverse, fontSize: 11, fontWeight: '700' },
+  removeBtn: { position: 'absolute', top: 2, right: 2, width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.toast, alignItems: 'center', justifyContent: 'center' },
   noteRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   noteBadge: { width: 20, height: 20, borderRadius: 10, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
-  note: { flex: 1, minHeight: THUMB, backgroundColor: Colors.background, borderRadius: 10, paddingHorizontal: 12, paddingTop: 10, fontSize: 14, color: Colors.textPrimary, textAlignVertical: 'top' },
+  note: { flex: 1, minHeight: THUMB, backgroundColor: Colors.bg, borderRadius: Radius.sm, paddingHorizontal: 12, paddingTop: 10, fontSize: 15, color: Colors.textPrimary, textAlignVertical: 'top' },
   noteSmall: { minHeight: 40, paddingTop: 8, paddingBottom: 8 },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   iconBtn: { padding: 6 },
-  joinChip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14, backgroundColor: Colors.background },
+  joinChip: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 6, borderRadius: Radius.pill, backgroundColor: Colors.bg },
   joinText: { fontSize: 12, fontWeight: '600', color: Colors.textSecondary },
-  add: { height: 56, borderRadius: 14, borderWidth: 1.5, borderColor: Colors.border, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6, backgroundColor: Colors.background },
-  addLabel: { fontSize: 14, color: Colors.textSecondary },
+  add: { height: 56, borderRadius: Radius.md, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 6, backgroundColor: Colors.primaryLight },
+  addLabel: { fontSize: 15, fontWeight: '600', color: Colors.primary },
 });

@@ -5,6 +5,7 @@ import { useRouter, useSegments } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { usePostStore } from '@/stores/postStore';
 import { Colors } from '@/constants/colors';
+import { Radius } from '@/constants/styles';
 import { Touchable } from '@/components/ui/Touchable';
 
 /** 어느 화면에서든 상단에 뜨는 글 작성 진행/완료 표시 */
@@ -26,8 +27,6 @@ export function GenerationBanner() {
     if (status === 'done') router.push('/(main)/preview');
   };
 
-  const tone =
-    status === 'running' ? Colors.primary : status === 'done' ? Colors.success : Colors.error;
   const label =
     status === 'running'
       ? `'${place}' 글 작성 중…`
@@ -37,14 +36,14 @@ export function GenerationBanner() {
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { top: insets.top + 6 }]}>
-      <Touchable style={[styles.pill, { backgroundColor: tone }]} onPress={onPress} activeOpacity={0.85}>
+      <Touchable style={styles.pill} onPress={onPress} activeOpacity={0.85}>
         {status === 'running' ? (
-          <ActivityIndicator size="small" color={Colors.white} />
+          <ActivityIndicator size="small" color={Colors.textInverse} />
         ) : (
-          <Ionicons name={status === 'done' ? 'checkmark-circle' : 'alert-circle'} size={18} color={Colors.white} />
+          <Ionicons name={status === 'done' ? 'checkmark-circle' : 'alert-circle'} size={20} color={status === 'done' ? Colors.success : Colors.error} />
         )}
         <Text style={styles.text} numberOfLines={1}>{label}</Text>
-        {status === 'error' && <Ionicons name="close" size={16} color={Colors.white} />}
+        {status === 'error' && <Ionicons name="close" size={16} color={Colors.textDisabled} />}
       </Touchable>
     </View>
   );
@@ -55,16 +54,12 @@ const styles = StyleSheet.create({
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 20,
+    gap: 10,
+    paddingHorizontal: 18,
+    height: 48,
+    borderRadius: Radius.pill,
     maxWidth: '100%',
-    shadowColor: '#000',
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 6,
+    backgroundColor: Colors.toast,
   },
-  text: { color: Colors.white, fontSize: 13, fontWeight: '600', flexShrink: 1 },
+  text: { color: Colors.textInverse, fontSize: 14, fontWeight: '600', flexShrink: 1 },
 });

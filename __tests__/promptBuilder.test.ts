@@ -28,6 +28,8 @@ describe('buildSystemPrompt', () => {
     expect(p).toContain('반말로 쓴다');
     expect(p).toContain('별점 2점');
     expect(p).toContain('[[사진N]]');
+    expect(p).toContain('10년간');
+    expect(p).toContain('지어내서는 안 됩니다');
   });
 });
 

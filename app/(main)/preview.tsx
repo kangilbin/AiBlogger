@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   ScrollView,
   StyleSheet,
   Alert,
@@ -19,6 +18,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { PostBody } from '@/components/ui/PostBody';
 import { ScreenHeader } from '@/components/layout/ScreenHeader';
 import { Colors } from '@/constants/colors';
+import { Radius, Typo, SCREEN_PADDING } from '@/constants/styles';
+import { TextField } from '@/components/ui/TextField';
+import { BottomBar } from '@/components/ui/BottomBar';
 import { Touchable } from '@/components/ui/Touchable';
 
 export default function PreviewScreen() {
@@ -55,7 +57,7 @@ export default function PreviewScreen() {
         title="미리보기"
         onBack={() => router.back()}
         right={
-          <Touchable onPress={() => setIsEditing(!isEditing)}>
+          <Touchable onPress={() => setIsEditing(!isEditing)} hitSlop={10}>
             <Text style={styles.editBtnText}>{isEditing ? '완료' : '수정'}</Text>
           </Touchable>
         }
@@ -73,26 +75,28 @@ export default function PreviewScreen() {
         >
           {isEditing ? (
             <View style={{ gap: 12 }}>
-              <TextInput style={styles.titleInput} value={title} onChangeText={(t) => setField({ title: t })} placeholder="제목" multiline />
+              <TextField style={styles.titleInput} value={title} onChangeText={(t) => setField({ title: t })} placeholder="제목" multiline />
               <Text style={styles.editHint}>사진 위치는 [[사진N]] 줄로 표시돼요. 줄을 옮기면 사진 위치가 바뀌어요.</Text>
-              <TextInput
+              <TextField
                 style={styles.editableText}
                 value={body}
                 onChangeText={(t) => setField({ body: t })}
                 multiline
-                textAlignVertical="top"
               />
             </View>
           ) : (
-            <View style={{ gap: 14 }}>
+            <View style={{ gap: 16 }}>
               <Text style={styles.postTitle}>{title}</Text>
               <PostBody body={body} photos={photos} />
               {showMap && (
-                <View style={{ marginTop: 14, padding: 14, borderRadius: 12, backgroundColor: Colors.primaryLight }}>
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: Colors.textPrimary }}>📍 위치</Text>
-                  <Text style={{ fontSize: 13, color: Colors.textSecondary, marginTop: 4 }}>
-                    발행하면 글 맨 아래에 '{place?.name ?? placeName}' 구글 지도가 붙어요{place?.address ? `\n${place.address}` : ''}.
-                  </Text>
+                <View style={styles.mapNote}>
+                  <Ionicons name="location" size={20} color={Colors.primary} />
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={styles.mapTitle}>위치 지도</Text>
+                    <Text style={Typo.caption}>
+                      발행하면 글 맨 아래에 '{place?.name ?? placeName}' 구글 지도가 붙어요{place?.address ? `\n${place.address}` : ''}.
+                    </Text>
+                  </View>
                 </View>
               )}
               {labels.length > 0 && <Text style={styles.labels}>{labels.map((l) => `#${l}`).join(' ')}</Text>}
@@ -100,19 +104,10 @@ export default function PreviewScreen() {
           )}
         </ScrollView>
 
-        <View style={styles.footer}>
-          <Button
-            label="다시 생성"
-            onPress={handleRegenerate}
-            variant="secondary"
-            style={styles.footerBtn}
-          />
-          <Button
-            label="발행하기"
-            onPress={handlePublish}
-            style={styles.footerBtn}
-          />
-        </View>
+        <BottomBar row>
+          <Button label="다시 생성" onPress={handleRegenerate} variant="secondary" style={styles.footerBtn} />
+          <Button label="발행하기" onPress={handlePublish} style={styles.footerBtn} />
+        </BottomBar>
       </KeyboardAvoidingView>
 
       <LoadingOverlay visible={genStatus === 'running'} message="다시 작성하고 있어요..." />
@@ -121,59 +116,16 @@ export default function PreviewScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  backBtn: { width: 40 },
-  backIcon: { fontSize: 20, color: Colors.textPrimary },
-  title: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '600',
-    color: Colors.textPrimary,
-    textAlign: 'center',
-  },
-  editBtn: { width: 40, alignItems: 'flex-end' },
-  editBtnText: { fontSize: 15, color: Colors.primary, fontWeight: '600' },
+  container: { flex: 1, backgroundColor: Colors.bg },
+  editBtnText: { fontSize: 16, color: Colors.primary, fontWeight: '600' },
   scroll: { flex: 1 },
-  content: { padding: 20, paddingBottom: 40 },
-  postTitle: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary, lineHeight: 30 },
-  titleInput: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary, backgroundColor: Colors.white, borderRadius: 12, padding: 14, borderWidth: 1.5, borderColor: Colors.primary },
-  editHint: { fontSize: 12, color: Colors.textSecondary },
-  labels: { fontSize: 13, color: Colors.primary, lineHeight: 20 },
-  previewText: {
-    fontSize: 15,
-    color: Colors.textPrimary,
-    lineHeight: 26,
-  },
-  editableText: {
-    fontSize: 15,
-    color: Colors.textPrimary,
-    lineHeight: 26,
-    backgroundColor: Colors.white,
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 400,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-  },
-  footer: {
-    flexDirection: 'row',
-    padding: 16,
-    gap: 12,
-    backgroundColor: Colors.white,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-  },
+  content: { paddingHorizontal: SCREEN_PADDING, paddingTop: 8, paddingBottom: 40 },
+  postTitle: { ...Typo.display, fontSize: 24, lineHeight: 34 },
+  titleInput: { fontSize: 20, fontWeight: '700', lineHeight: 28 },
+  editHint: { ...Typo.caption, color: Colors.textTertiary },
+  labels: { ...Typo.body, color: Colors.primary },
+  editableText: { fontSize: 16, lineHeight: 26, minHeight: 400, padding: 16 },
+  mapNote: { flexDirection: 'row', gap: 12, padding: 16, borderRadius: Radius.md, backgroundColor: Colors.fill },
+  mapTitle: { ...Typo.body, fontWeight: '600' },
   footerBtn: { flex: 1 },
 });

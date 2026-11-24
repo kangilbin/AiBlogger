@@ -8,8 +8,8 @@ function TabIcon({ name, focused }: { name: IoniconName; focused: boolean }) {
   return (
     <Ionicons
       name={focused ? name : (`${name}-outline` as IoniconName)}
-      size={24}
-      color={focused ? Colors.primary : Colors.textSecondary}
+      size={26}
+      color={focused ? Colors.primary : Colors.textDisabled}
     />
   );
 }
@@ -20,18 +20,19 @@ export default function MainLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
+        tabBarInactiveTintColor: Colors.textDisabled,
         tabBarStyle: {
-          backgroundColor: Colors.white,
-          borderTopColor: Colors.border,
+          backgroundColor: Colors.bg,
+          borderTopColor: Colors.fill,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 6,
+          height: 64,
+          paddingBottom: 10,
+          paddingTop: 8,
+          elevation: 0,
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '500',
+          fontWeight: '600',
           marginTop: 2,
         },
       }}

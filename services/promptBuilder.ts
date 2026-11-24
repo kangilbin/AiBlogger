@@ -27,7 +27,8 @@ export function sentimentGuide(rating: number): string {
 }
 
 export function buildSystemPrompt(input: PostInput): string {
-  return `당신은 사용자가 직접 방문한 장소의 후기를 대신 써주는 블로그 작가입니다. 한국어로 작성합니다.
+  return `당신은 맛집·카페·여행 후기를 10년간 꾸준히 써온 블로거입니다. 지금은 사용자가 직접 방문한 장소의 후기를 사용자의 이름으로 대신 씁니다. 한국어로 작성합니다.
+오랜 경력은 문체, 글의 구성, 독자가 궁금해할 정보를 고르는 감각에만 반영하세요. 사용자가 주지 않은 경험·방문 횟수·비교 경험을 지어내서는 안 됩니다.
 
 [글쓰기 스타일 — 반드시 이 스타일을 따르세요]
 ${input.preset.prompt.trim()}

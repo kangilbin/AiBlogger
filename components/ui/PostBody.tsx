@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/colors';
+import { Radius } from '@/constants/styles';
 import { layoutBlocks } from '@/utils/postFormat';
 import type { PhotoEntry } from '@/types';
 
@@ -36,10 +37,10 @@ export function PostBody({ body, photos }: { body: string; photos: PhotoEntry[] 
 }
 
 const styles = StyleSheet.create({
-  heading: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary, marginTop: 6 },
-  p: { fontSize: 15, lineHeight: 26, color: Colors.textPrimary },
+  heading: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary, marginTop: 8, letterSpacing: -0.2 },
+  p: { fontSize: 16, lineHeight: 27, color: Colors.textPrimary },
   gallery: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  cell: { width: '49%', aspectRatio: 1, borderRadius: 10, backgroundColor: Colors.divider },
+  cell: { width: '49%', aspectRatio: 1, borderRadius: Radius.sm, backgroundColor: Colors.fill },
   cellWide: { width: '100%', aspectRatio: 16 / 9 },
-  img: { width: '100%', aspectRatio: 4 / 3, borderRadius: 12, backgroundColor: Colors.divider },
+  img: { width: '100%', aspectRatio: 4 / 3, borderRadius: Radius.sm, backgroundColor: Colors.fill },
 });

@@ -1,38 +1,21 @@
 import React from 'react';
-import {
-  View, Text,
-  ScrollView, StyleSheet, Alert,
-} from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '@/stores/authStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { Colors } from '@/constants/colors';
-import { Touchable } from '@/components/ui/Touchable';
+import { Typo, SCREEN_PADDING } from '@/constants/styles';
+import { ScreenHeader } from '@/components/layout/ScreenHeader';
+import { ListRow, RowIcon } from '@/components/ui/ListRow';
 
-function SettingRow({
-  icon, label, value, onPress, danger,
-}: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  label: string;
-  value?: string;
-  onPress?: () => void;
-  danger?: boolean;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Touchable style={styles.row} onPress={onPress} activeOpacity={0.6} disabled={!onPress}>
-      <View style={styles.rowLeft}>
-        <View style={[styles.rowIcon, danger && styles.rowIconDanger]}>
-          <Ionicons name={icon} size={18} color={danger ? Colors.error : Colors.primary} />
-        </View>
-        <Text style={[styles.rowLabel, danger && styles.rowLabelDanger]}>{label}</Text>
-      </View>
-      <View style={styles.rowRight}>
-        {value ? <Text style={styles.rowValue} numberOfLines={1}>{value}</Text> : null}
-        {onPress && <Ionicons name="chevron-forward" size={16} color={Colors.textDisabled} />}
-      </View>
-    </Touchable>
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {children}
+    </View>
   );
 }
 
@@ -53,10 +36,6 @@ export default function SettingsScreen() {
     ]);
   };
 
-  const handleChangeBlog = () => {
-    router.push('/(auth)/blog-select');
-  };
-
   const handleLogout = () => {
     Alert.alert('로그아웃', '정말 로그아웃 하시겠어요?', [
       { text: '취소', style: 'cancel' },
@@ -66,140 +45,55 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Touchable
-          onPress={() => router.back()}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
-        </Touchable>
-        <Text style={styles.title}>설정</Text>
-        <View style={{ width: 24 }} />
-      </View>
+      <ScreenHeader title="설정" onBack={() => router.back()} />
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* 프로필 */}
-        <View style={styles.profileCard}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.profile}>
           <View style={styles.avatar}>
-            <Ionicons name="person" size={28} color={Colors.primary} />
+            <Ionicons name="person" size={26} color={Colors.textInverse} />
           </View>
-          <View>
-            <Text style={styles.profileName}>{user?.name}</Text>
-            <Text style={styles.profileEmail}>{user?.email}</Text>
-          </View>
-        </View>
-
-        {/* Gemini API */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>AI 설정</Text>
-          <View style={styles.card}>
-            <SettingRow
-              icon="key-outline"
-              label="Gemini API 키"
-              value={hasGeminiKey ? '등록됨' : '등록하기'}
-              onPress={handleKeyPress}
-            />
+          <View style={{ gap: 2 }}>
+            <Text style={Typo.title}>{user?.name}</Text>
+            <Text style={Typo.caption}>{user?.email}</Text>
           </View>
         </View>
 
-        {/* 글쓰기 스타일 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>글쓰기</Text>
-          <View style={styles.card}>
-            <SettingRow icon="color-wand-outline" label="글쓰기 스타일 편집" onPress={() => router.push('/prompts')} />
-          </View>
-        </View>
+        <Section title="AI">
+          <ListRow
+            left={<RowIcon name="key-outline" />}
+            title="Gemini API 키"
+            right={hasGeminiKey ? '등록됨' : '등록하기'}
+            onPress={handleKeyPress}
+          />
+          <ListRow
+            left={<RowIcon name="color-wand-outline" />}
+            title="글쓰기 스타일"
+            onPress={() => router.push('/prompts')}
+          />
+        </Section>
 
-        {/* 블로그 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>연동 블로그</Text>
-          <View style={styles.card}>
-            <SettingRow icon="logo-google" label="Blogger" value={blog?.name ?? '미선택'} onPress={handleChangeBlog} />
-          </View>
-        </View>
+        <Section title="블로그">
+          <ListRow
+            left={<RowIcon name="logo-google" />}
+            title="Blogger"
+            right={blog?.name ?? '미선택'}
+            onPress={() => router.push('/(auth)/blog-select')}
+          />
+        </Section>
 
-        {/* 계정 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>계정</Text>
-          <View style={styles.card}>
-            <SettingRow
-              icon="log-out-outline"
-              label="로그아웃"
-              onPress={handleLogout}
-              danger
-            />
-          </View>
-        </View>
-
-        <View style={{ height: 40 }} />
+        <Section title="계정">
+          <ListRow left={<RowIcon name="log-out-outline" danger />} title="로그아웃" danger chevron={false} onPress={handleLogout} />
+        </Section>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  title: { fontSize: 17, fontWeight: '600', color: Colors.textPrimary },
-  profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    backgroundColor: Colors.white,
-    padding: 20,
-    marginBottom: 8,
-  },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 16,
-    backgroundColor: Colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  profileName: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary },
-  profileEmail: { fontSize: 13, color: Colors.textSecondary, marginTop: 2 },
-  section: { marginBottom: 8 },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  card: { backgroundColor: Colors.white },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.divider,
-  },
-  rowLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  rowIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 9,
-    backgroundColor: Colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rowIconDanger: { backgroundColor: '#FFF0F0' },
-  rowLabel: { fontSize: 15, fontWeight: '500', color: Colors.textPrimary },
-  rowLabelDanger: { color: Colors.error },
-  rowRight: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  rowValue: { fontSize: 14, color: Colors.textSecondary, maxWidth: 120 },
+  container: { flex: 1, backgroundColor: Colors.bg },
+  content: { paddingHorizontal: SCREEN_PADDING, paddingBottom: 40 },
+  profile: { flexDirection: 'row', alignItems: 'center', gap: 16, paddingVertical: 20 },
+  avatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
+  section: { marginTop: 16 },
+  sectionTitle: { ...Typo.caption, fontSize: 14, fontWeight: '600', color: Colors.textTertiary, paddingVertical: 8 },
 });

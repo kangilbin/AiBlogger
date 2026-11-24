@@ -5,6 +5,7 @@ import { listBlogs } from '@/services/bloggerService';
 import { errorMessage } from '@/services/errors';
 import { useAuthStore } from '@/stores/authStore';
 import { Colors } from '@/constants/colors';
+import { Radius } from '@/constants/styles';
 import type { BlogInfo } from '@/types';
 import { Touchable } from '@/components/ui/Touchable';
 
@@ -14,7 +15,7 @@ export function BlogSwitcherTrigger({ open, onPress }: { open: boolean; onPress:
   return (
     <Touchable style={styles.trigger} onPress={onPress} accessibilityRole="button" accessibilityLabel="블로그 변경" pressScale={1}>
       <Text style={styles.name} numberOfLines={1}>{blog?.name ?? '블로그 선택'}</Text>
-      <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={18} color={Colors.textSecondary} />
+      <Ionicons name={open ? 'chevron-up' : 'chevron-down'} size={20} color={Colors.textTertiary} />
     </Touchable>
   );
 }
@@ -113,23 +114,21 @@ export function BlogDropdown({ open, top, onClose }: { open: boolean; top: numbe
 
 const styles = StyleSheet.create({
   trigger: { flexDirection: 'row', alignItems: 'center', gap: 4, flexShrink: 1, maxWidth: '75%' },
-  name: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary, flexShrink: 1 },
+  name: { fontSize: 20, fontWeight: '700', color: Colors.textPrimary, flexShrink: 1, letterSpacing: -0.4 },
   layer: { position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 10 },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.25)' },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: Colors.overlay },
   sheet: {
-    backgroundColor: Colors.white,
-    padding: 8,
+    backgroundColor: Colors.bg,
+    padding: 12,
     gap: 4,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
   },
-  item: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 12 },
+  item: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 14, borderRadius: Radius.sm },
   itemOn: { backgroundColor: Colors.primaryLight },
   itemName: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
-  itemUrl: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-  add: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 12, borderTopWidth: 1, borderTopColor: Colors.border, marginTop: 4 },
+  itemUrl: { fontSize: 13, color: Colors.textSecondary, marginTop: 2 },
+  add: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 14, marginTop: 4 },
   addText: { fontSize: 14, fontWeight: '600', color: Colors.primary },
   err: { fontSize: 13, color: Colors.error },
   link: { fontSize: 14, fontWeight: '600', color: Colors.primary },

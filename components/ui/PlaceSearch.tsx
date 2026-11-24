@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { searchPlaces, hasKakaoSearch } from '@/services/placeService';
 import { errorMessage } from '@/services/errors';
 import { Colors } from '@/constants/colors';
+import { Radius } from '@/constants/styles';
 import { Touchable } from '@/components/ui/Touchable';
 import type { PlaceInfo } from '@/types';
 
@@ -72,7 +73,7 @@ export function PlaceSearch({ value, initialQuery = '', onChange }: Props) {
   return (
     <View style={{ gap: 8 }}>
       <View style={styles.inputWrap}>
-        <Ionicons name="search" size={18} color={Colors.textSecondary} />
+        <Ionicons name="search" size={18} color={Colors.textTertiary} />
         <TextInput
           style={styles.input}
           value={query}
@@ -109,15 +110,15 @@ export function PlaceSearch({ value, initialQuery = '', onChange }: Props) {
 }
 
 const styles = StyleSheet.create({
-  inputWrap: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.border, borderRadius: 12, paddingHorizontal: 14 },
-  input: { flex: 1, paddingVertical: 13, fontSize: 15, color: Colors.textPrimary },
-  list: { backgroundColor: Colors.white, borderRadius: 12, borderWidth: 1, borderColor: Colors.border, overflow: 'hidden' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: Colors.border },
+  inputWrap: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Colors.fill, borderRadius: Radius.sm, paddingHorizontal: 14 },
+  input: { flex: 1, paddingVertical: 14, fontSize: 16, color: Colors.textPrimary },
+  list: { backgroundColor: Colors.fill, borderRadius: Radius.sm, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12 },
   name: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
-  addr: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-  selected: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: Colors.primaryLight, borderRadius: 12, padding: 14 },
-  selName: { fontSize: 15, fontWeight: '700', color: Colors.textPrimary },
-  selAddr: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
+  addr: { fontSize: 13, color: Colors.textSecondary, marginTop: 2 },
+  selected: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: Colors.primaryLight, borderRadius: Radius.sm, padding: 14 },
+  selName: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
+  selAddr: { fontSize: 13, color: Colors.textSecondary, marginTop: 2 },
   err: { fontSize: 13, color: Colors.error },
-  hint: { fontSize: 12, color: Colors.textSecondary, lineHeight: 18 },
+  hint: { fontSize: 13, color: Colors.textTertiary, lineHeight: 18 },
 });

@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/Button';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { ScreenHeader } from '@/components/layout/ScreenHeader';
 import { Colors } from '@/constants/colors';
+import { Radius, Typo, SCREEN_PADDING } from '@/constants/styles';
+import { BottomBar } from '@/components/ui/BottomBar';
 import { useShallow } from 'zustand/react/shallow';
 import { Touchable } from '@/components/ui/Touchable';
 
@@ -42,156 +44,99 @@ export default function PublishScreen() {
   if (resultUrl) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.successContainer}>
-          <View style={styles.successIconBox}>
-            <Ionicons name="checkmark" size={40} color={Colors.white} />
+        <View style={styles.success}>
+          <View style={styles.successIcon}>
+            <Ionicons name="checkmark" size={44} color={Colors.textInverse} />
           </View>
-          <Text style={styles.successTitle}>발행 완료!</Text>
+          <Text style={Typo.display}>발행 완료!</Text>
           <Text style={styles.successDesc}>블로그에 글이 등록되었어요</Text>
-          <View style={styles.successActions}>
-            <Button
-              label="링크 복사"
-              variant="secondary"
-              onPress={() => { Clipboard.setStringAsync(resultUrl); Alert.alert('복사됨', '클립보드에 복사되었습니다.'); }}
-              fullWidth
-            />
-            <Button
-              label="블로그에서 보기"
-              onPress={() => router.push({
-                pathname: '/(main)/browser',
-                params: { url: resultUrl, title: '발행된 글' },
-              })}
-              fullWidth
-            />
-            <Button
-              label="홈으로"
-              variant="ghost"
-              onPress={() => { resetForm(); router.replace('/(main)'); }}
-              fullWidth
-            />
-          </View>
         </View>
+        <BottomBar>
+          <Button
+            label="블로그에서 보기"
+            onPress={() => router.push({
+              pathname: '/(main)/browser',
+              params: { url: resultUrl, title: '발행된 글' },
+            })}
+            fullWidth
+          />
+          <Button
+            label="링크 복사"
+            variant="secondary"
+            onPress={() => { Clipboard.setStringAsync(resultUrl); Alert.alert('복사됨', '클립보드에 복사되었어요.'); }}
+            fullWidth
+          />
+          <Button
+            label="홈으로"
+            variant="ghost"
+            onPress={() => { resetForm(); router.replace('/(main)'); }}
+            fullWidth
+          />
+        </BottomBar>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScreenHeader title="Blogger 발행" onBack={() => router.back()} />
+      <ScreenHeader title="발행" onBack={() => router.back()} />
 
       <View style={styles.content}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>발행 블로그</Text>
+        <Text style={Typo.display}>어떻게{'\n'}발행할까요?</Text>
+
+        <View style={styles.blogCard}>
+          <Text style={styles.blogLabel}>발행할 블로그</Text>
           <Text style={styles.blogName}>{blog?.name ?? '선택 안 됨'}</Text>
-          <Text style={[styles.cardTitle, { marginTop: 12 }]}>발행 방식</Text>
-          {[
-            { label: '즉시 발행', desc: '바로 블로그에 공개됩니다', val: false },
-            { label: '임시 저장', desc: 'Blogger 초안으로 저장돼요 (Blogger에서 확인 후 발행)', val: true },
-          ].map(({ label, desc, val }) => (
-            <Touchable
-              key={String(val)}
-              style={styles.radioRow}
-              onPress={() => setIsDraft(val)}
-              activeOpacity={0.7}
-            >
-              <View style={[styles.radio, isDraft === val && styles.radioActive]}>
-                {isDraft === val && <View style={styles.radioDot} />}
-              </View>
-              <View style={styles.radioText}>
-                <Text style={styles.radioLabel}>{label}</Text>
-                <Text style={styles.radioDesc}>{desc}</Text>
-              </View>
-            </Touchable>
-          ))}
         </View>
 
-        <View style={{ flex: 1 }} />
-        <Button label="발행하기" onPress={handlePublish} fullWidth />
+        <View style={{ gap: 10 }}>
+          {[
+            { label: '즉시 발행', desc: '바로 블로그에 공개돼요', val: false },
+            { label: '임시 저장', desc: 'Blogger 초안으로 저장돼요. Blogger에서 확인 후 발행하세요', val: true },
+          ].map(({ label, desc, val }) => {
+            const on = isDraft === val;
+            return (
+              <Touchable
+                key={String(val)}
+                style={[styles.option, on && styles.optionOn]}
+                onPress={() => setIsDraft(val)}
+                pressScale={0.98}
+              >
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text style={styles.optionLabel}>{label}</Text>
+                  <Text style={styles.optionDesc}>{desc}</Text>
+                </View>
+                <View style={[styles.radio, on && styles.radioOn]}>
+                  {on && <Ionicons name="checkmark" size={14} color={Colors.textInverse} />}
+                </View>
+              </Touchable>
+            );
+          })}
+        </View>
       </View>
 
-      <LoadingOverlay visible={!!publishProgress} message={publishProgress ?? ""} />
+      <BottomBar>
+        <Button label={isDraft ? '임시 저장하기' : '발행하기'} onPress={handlePublish} fullWidth />
+      </BottomBar>
 
+      <LoadingOverlay visible={!!publishProgress} message={publishProgress ?? ""} />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    backgroundColor: Colors.white,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-  },
-  title: { fontSize: 17, fontWeight: '600', color: Colors.textPrimary },
-  content: { flex: 1, padding: 20, gap: 16 },
-  card: {
-    backgroundColor: Colors.white,
-    borderRadius: 16,
-    padding: 16,
-    gap: 4,
-  },
-  cardTitle: { fontSize: 13, fontWeight: '600', color: Colors.textSecondary, marginBottom: 8, letterSpacing: 0.3 },
-  blogName: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
-  radioRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.divider,
-  },
-  radio: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioActive: { borderColor: Colors.primary },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Colors.primary },
-  radioText: { gap: 2 },
-  radioLabel: { fontSize: 15, fontWeight: '600', color: Colors.textPrimary },
-  radioDesc: { fontSize: 13, color: Colors.textSecondary },
-  successContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 32,
-    gap: 10,
-  },
-  successIconBox: {
-    width: 80,
-    height: 80,
-    borderRadius: 28,
-    backgroundColor: Colors.success,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  successTitle: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary, letterSpacing: -0.3 },
-  successDesc: { fontSize: 15, color: Colors.textSecondary },
-  successActions: { width: '100%', marginTop: 28, gap: 10 },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  modalBox: {
-    backgroundColor: Colors.white,
-    borderRadius: 20,
-    padding: 24,
-    width: '100%',
-    gap: 12,
-  },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: Colors.textPrimary },
-  modalDesc: { fontSize: 14, color: Colors.textSecondary, lineHeight: 22, marginBottom: 4 },
+  container: { flex: 1, backgroundColor: Colors.bg },
+  content: { flex: 1, paddingHorizontal: SCREEN_PADDING, paddingTop: 8, gap: 24 },
+  blogCard: { backgroundColor: Colors.fill, borderRadius: Radius.md, padding: 16, gap: 4 },
+  blogLabel: Typo.caption,
+  blogName: { ...Typo.heading },
+  option: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: Colors.fill, borderRadius: Radius.md, padding: 18, borderWidth: 1.5, borderColor: 'transparent' },
+  optionOn: { backgroundColor: Colors.primaryLight, borderColor: Colors.primary },
+  optionLabel: { ...Typo.heading },
+  optionDesc: Typo.caption,
+  radio: { width: 24, height: 24, borderRadius: 12, backgroundColor: Colors.fillStrong, alignItems: 'center', justifyContent: 'center' },
+  radioOn: { backgroundColor: Colors.primary },
+  success: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
+  successIcon: { width: 88, height: 88, borderRadius: 44, backgroundColor: Colors.success, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  successDesc: { ...Typo.body, fontSize: 16, color: Colors.textSecondary },
 });

@@ -11,7 +11,7 @@ interface StarRatingProps {
   readonly?: boolean;
 }
 
-export function StarRating({ value, onChange, size = 32, readonly = false }: StarRatingProps) {
+export function StarRating({ value, onChange, size = 36, readonly = false }: StarRatingProps) {
   const stars = [1, 2, 3, 4, 5];
 
   const getIcon = (index: number) => {
@@ -37,7 +37,7 @@ export function StarRating({ value, onChange, size = 32, readonly = false }: Sta
           <Ionicons
             name={getIcon(index)}
             size={size}
-            color={value >= index - 0.5 ? Colors.star : Colors.starEmpty}
+            color={value >= index - 0.5 ? Colors.star : Colors.fillStrong}
             style={styles.starIcon}
           />
         </View>
@@ -50,14 +50,26 @@ export function StarRating({ value, onChange, size = 32, readonly = false }: Sta
 }
 
 const styles = StyleSheet.create({
-  container: { flexDirection: 'row', alignItems: 'center', gap: 2 },
+  container: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   starWrapper: { position: 'relative' },
   halfTouch: { position: 'absolute', zIndex: 1, top: 0 },
   starIcon: { pointerEvents: 'none' },
   valueText: {
-    fontSize: 15,
+    fontSize: 20,
     fontWeight: '700',
     color: Colors.textPrimary,
-    marginLeft: 8,
+    marginLeft: 12,
   },
+  compact: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  compactText: { fontSize: 13, fontWeight: '600', color: Colors.textSecondary },
 });
+
+/** 목록용 간단 별점: ★ 4.5 */
+export function RatingValue({ value }: { value: number }) {
+  return (
+    <View style={styles.compact}>
+      <Ionicons name="star" size={13} color={Colors.star} />
+      <Text style={styles.compactText}>{value.toFixed(1)}</Text>
+    </View>
+  );
+}
