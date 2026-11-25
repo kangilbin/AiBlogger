@@ -44,6 +44,13 @@ export interface GeneratedPost {
   alts?: string[];
 }
 
+/** 글 분류 테마. 발행 시 Blogger 라벨로 붙음(상위: '여행', 하위 선택 시: '여행/국내') */
+export interface Theme {
+  id: string;
+  name: string;
+  subs: { id: string; name: string }[];
+}
+
 /** generated: AI가 작성만 한 미발행 글(이어서 수정/발행 가능), draft: Blogger 임시글, published: 발행 */
 export type PublishStatus = 'generated' | 'draft' | 'published';
 

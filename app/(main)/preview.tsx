@@ -21,6 +21,7 @@ import { Radius, Typo, SCREEN_PADDING } from '@/constants/styles';
 import { TextField } from '@/components/ui/TextField';
 import { BottomBar } from '@/components/ui/BottomBar';
 import { Touchable } from '@/components/ui/Touchable';
+import { ThemeSelector } from '@/components/ui/ThemeSelector';
 
 export default function PreviewScreen() {
   const router = useRouter();
@@ -123,6 +124,7 @@ export default function PreviewScreen() {
               {labels.length > 0 && <Text style={styles.labels}>{labels.map((l) => `#${l}`).join(' ')}</Text>}
             </View>
           )}
+          <ThemeSelector labels={labels} onChange={(l) => { setField({ labels: l }); saveDraft(); }} />
         </ScrollView>
 
         <BottomBar row>

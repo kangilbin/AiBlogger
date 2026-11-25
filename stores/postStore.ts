@@ -9,6 +9,8 @@ import { joinPhotoTo, removePhotoAt, moveGroup } from '@/utils/photoGroup';
 import { useSettingsStore } from './settingsStore';
 import { useAuthStore } from './authStore';
 import { useHistoryStore } from './historyStore';
+import { useThemeStore } from './themeStore';
+import { allThemeLabels, applyThemeLabel } from '@/utils/theme';
 import type { PhotoEntry, PlaceInfo, PostHistory } from '@/types';
 
 type Result = { ok: true } | { ok: false; error: string; code?: string };
@@ -49,7 +51,7 @@ interface PostState {
   setPhotoJoin: (index: number, join: boolean) => void;
   /** from 사진을 to 사진의 묶음으로 옮김 (드래그앤드랍) */
   joinPhoto: (from: number, to: number) => void;
-  setField: (patch: Partial<Pick<PostState, 'placeName' | 'place' | 'showMap' | 'rating' | 'summary' | 'notes' | 'extraPrompt' | 'title' | 'body'>>) => void;
+  setField: (patch: Partial<Pick<PostState, 'placeName' | 'place' | 'showMap' | 'rating' | 'summary' | 'notes' | 'extraPrompt' | 'title' | 'body' | 'labels'>>) => void;
 
   /** 현재 글을 '작성됨(미발행)'으로 이력에 저장/갱신 */
   saveDraft: () => void;
@@ -180,7 +182,10 @@ export const usePostStore = create<PostState>((set, get) => ({
       preset: useSettingsStore.getState().selectedPreset(),
     })
       .then((post) => {
-        set({ title: post.title, body: post.body, labels: post.labels, alts: post.alts ?? [], genStatus: 'done' });
+        // 사용자가 고른 테마 라벨은 다시 생성해도 유지
+        const known = allThemeLabels(useThemeStore.getState().themes);
+        const picked = get().labels.find((l) => known.includes(l)) ?? null;
+        set({ title: post.title, body: post.body, labels: applyThemeLabel(post.labels, picked, known), alts: post.alts ?? [], genStatus: 'done' });
         get().saveDraft();
         notifyIfBackground(place, true);
       })

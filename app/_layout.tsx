@@ -58,6 +58,7 @@ export default function RootLayout() {
         <Stack.Screen name="(main)" />
         <Stack.Screen name="settings" />
         <Stack.Screen name="prompts" />
+        <Stack.Screen name="themes" />
         <Stack.Screen name="gemini-guide" />
       </Stack.Protected>
     </Stack>

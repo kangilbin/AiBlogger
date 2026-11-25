@@ -74,6 +74,11 @@ export default function SettingsScreen() {
 
         <Section title="블로그">
           <ListRow
+            left={<RowIcon name="folder-open-outline" />}
+            title="테마(카테고리) 관리"
+            onPress={() => router.push('/themes')}
+          />
+          <ListRow
             left={<RowIcon name="logo-google" />}
             title="Blogger"
             right={blog?.name ?? '미선택'}
