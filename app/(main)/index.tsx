@@ -18,7 +18,6 @@ import { BlogSwitcherTrigger, BlogDropdown } from '@/components/ui/BlogSwitcher'
 
 const STATUS: Record<PostHistory['publishStatus'], { label: string; tone: 'success' | 'warning' }> = {
   published: { label: '발행', tone: 'success' },
-  draft: { label: '임시저장', tone: 'warning' },
   generated: { label: '발행 전', tone: 'warning' },
 };
 

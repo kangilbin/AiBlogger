@@ -10,10 +10,11 @@ import { allThemeLabels, applyThemeLabel, themeLabel } from '@/utils/theme';
 interface Props {
   labels: string[];
   onChange: (labels: string[]) => void;
+  hideTitle?: boolean;
 }
 
 /** 글에 붙일 테마 선택: 상위 → (있으면) 하위. 선택한 테마는 라벨 맨 앞에 들어감 */
-export function ThemeSelector({ labels, onChange }: Props) {
+export function ThemeSelector({ labels, onChange, hideTitle }: Props) {
   const router = useRouter();
   const themes = useThemeStore((s) => s.themes);
   const known = allThemeLabels(themes);
@@ -33,7 +34,7 @@ export function ThemeSelector({ labels, onChange }: Props) {
 
   return (
     <View style={{ gap: 8 }}>
-      <Text style={styles.title}>테마</Text>
+      {!hideTitle && <Text style={styles.title}>카테고리</Text>}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
         <Chip label="선택 안 함" on={!parent} onPress={() => select(null)} />
         {themes.map((t) => (

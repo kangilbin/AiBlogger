@@ -14,7 +14,6 @@ import { RatingValue } from '@/components/ui/StarRating';
 
 const STATUS: Record<PostHistory['publishStatus'], { label: string; tone: 'success' | 'warning' }> = {
   published: { label: '발행완료', tone: 'success' },
-  draft: { label: '임시저장', tone: 'warning' },
   generated: { label: '발행 전', tone: 'warning' },
 };
 
@@ -23,6 +22,10 @@ export default function HistoryScreen() {
   const history = useHistoryStore((s) => s.history);
   const remove = useHistoryStore((s) => s.remove);
   const loadFromHistory = usePostStore((s) => s.loadFromHistory);
+
+  const openPost = useCallback((item: PostHistory) => {
+    if (item.postUrl) router.push({ pathname: '/(main)/browser', params: { url: item.postUrl, title: item.placeName } });
+  }, [router]);
 
   const renderItem = useCallback(({ item }: { item: PostHistory }) => {
     const status = STATUS[item.publishStatus];
@@ -54,8 +57,8 @@ export default function HistoryScreen() {
               return;
             }
             router.push('/(main)/preview');
-          } else if (item.postUrl) {
-            router.push({ pathname: '/(main)/browser', params: { url: item.postUrl, title: item.placeName } });
+          } else {
+            openPost(item);
           }
         }}
         onLongPress={() =>
@@ -66,7 +69,7 @@ export default function HistoryScreen() {
         }
       />
     );
-  }, [router, loadFromHistory, remove]);
+  }, [router, loadFromHistory, remove, openPost]);
 
   return (
     <SafeAreaView style={styles.container}>

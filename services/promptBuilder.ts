@@ -11,6 +11,8 @@ export interface PostInput {
   notes: string; // 특이사항
   preset: PromptPreset;
   extraPrompt: string;
+  /** 사용자가 직접 정한 제목. 있으면 그대로 사용 */
+  customTitle?: string;
 }
 
 /** 별점에 따라 글 전체의 감정선·비중을 정하는 지침 */
@@ -93,6 +95,7 @@ export function buildUserText(input: PostInput): string {
     `분위기 참고용 평가(글에 숫자로 쓰지 말 것): ${input.rating}/5`,
     input.summary.trim() && `한줄평: ${input.summary.trim()}`,
     input.notes.trim() && `특이사항: ${input.notes.trim()}`,
+    input.customTitle?.trim() && `제목(사용자가 정함, title에 그대로 쓰고 본문은 이 제목과 어울리게): ${input.customTitle.trim()}`,
     input.extraPrompt.trim() && `추가 요청: ${input.extraPrompt.trim()}`,
     `사진 ${input.photos.length}장이 촬영 순서대로 이어집니다.`,
     groupSummary(input.photos),

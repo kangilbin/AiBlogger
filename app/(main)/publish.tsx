@@ -15,7 +15,6 @@ import { Colors } from '@/constants/colors';
 import { Radius, Typo, SCREEN_PADDING } from '@/constants/styles';
 import { BottomBar } from '@/components/ui/BottomBar';
 import { useShallow } from 'zustand/react/shallow';
-import { Touchable } from '@/components/ui/Touchable';
 
 export default function PublishScreen() {
   const router = useRouter();
@@ -23,11 +22,10 @@ export default function PublishScreen() {
     useShallow((s) => ({ publishProgress: s.publishProgress, publish: s.publish, resetForm: s.resetForm }))
   );
   const blog = useAuthStore((s) => s.blog);
-  const [isDraft, setIsDraft] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
 
   const handlePublish = async () => {
-    const res = await publish(isDraft);
+    const res = await publish();
     if (res.ok) {
       setResultUrl(res.url);
     } else if (res.code === 'SESSION_EXPIRED') {
@@ -82,41 +80,16 @@ export default function PublishScreen() {
       <ScreenHeader title="발행" onBack={() => router.back()} />
 
       <View style={styles.content}>
-        <Text style={Typo.display}>어떻게{'\n'}발행할까요?</Text>
+        <Text style={Typo.display}>이 글을{'\n'}발행할까요?</Text>
 
         <View style={styles.blogCard}>
           <Text style={styles.blogLabel}>발행할 블로그</Text>
           <Text style={styles.blogName}>{blog?.name ?? '선택 안 됨'}</Text>
         </View>
-
-        <View style={{ gap: 10 }}>
-          {[
-            { label: '즉시 발행', desc: '바로 블로그에 공개돼요', val: false },
-            { label: '임시 저장', desc: 'Blogger 초안으로 저장돼요. Blogger에서 확인 후 발행하세요', val: true },
-          ].map(({ label, desc, val }) => {
-            const on = isDraft === val;
-            return (
-              <Touchable
-                key={String(val)}
-                style={[styles.option, on && styles.optionOn]}
-                onPress={() => setIsDraft(val)}
-                pressScale={0.98}
-              >
-                <View style={{ flex: 1, gap: 2 }}>
-                  <Text style={styles.optionLabel}>{label}</Text>
-                  <Text style={styles.optionDesc}>{desc}</Text>
-                </View>
-                <View style={[styles.radio, on && styles.radioOn]}>
-                  {on && <Ionicons name="checkmark" size={14} color={Colors.textInverse} />}
-                </View>
-              </Touchable>
-            );
-          })}
-        </View>
       </View>
 
       <BottomBar>
-        <Button label={isDraft ? '임시 저장하기' : '발행하기'} onPress={handlePublish} fullWidth />
+        <Button label="발행하기" onPress={handlePublish} fullWidth />
       </BottomBar>
 
       <LoadingOverlay visible={!!publishProgress} message={publishProgress ?? ""} />
@@ -130,12 +103,6 @@ const styles = StyleSheet.create({
   blogCard: { backgroundColor: Colors.fill, borderRadius: Radius.md, padding: 16, gap: 4 },
   blogLabel: Typo.caption,
   blogName: { ...Typo.heading },
-  option: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: Colors.fill, borderRadius: Radius.md, padding: 18, borderWidth: 1.5, borderColor: 'transparent' },
-  optionOn: { backgroundColor: Colors.primaryLight, borderColor: Colors.primary },
-  optionLabel: { ...Typo.heading },
-  optionDesc: Typo.caption,
-  radio: { width: 24, height: 24, borderRadius: 12, backgroundColor: Colors.fillStrong, alignItems: 'center', justifyContent: 'center' },
-  radioOn: { backgroundColor: Colors.primary },
   success: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
   successIcon: { width: 88, height: 88, borderRadius: 44, backgroundColor: Colors.success, alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
   successDesc: { ...Typo.body, fontSize: 16, color: Colors.textSecondary },

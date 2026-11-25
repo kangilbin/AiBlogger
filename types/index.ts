@@ -51,8 +51,8 @@ export interface Theme {
   subs: { id: string; name: string }[];
 }
 
-/** generated: AI가 작성만 한 미발행 글(이어서 수정/발행 가능), draft: Blogger 임시글, published: 발행 */
-export type PublishStatus = 'generated' | 'draft' | 'published';
+/** generated: AI가 작성만 한 미발행 글(이어서 수정/발행 가능)published: 발행 */
+export type PublishStatus = 'generated' | 'published';
 
 /** 미발행 글을 그대로 다시 열기 위한 입력/사진 스냅샷 */
 export interface PostSnapshot {
@@ -62,6 +62,7 @@ export interface PostSnapshot {
   summary: string;
   notes: string;
   extraPrompt: string;
+  customTitle?: string;
 }
 
 export interface PostHistory {

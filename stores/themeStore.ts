@@ -49,7 +49,7 @@ export const useThemeStore = create<ThemeState>()(
         const name = cleanThemeName(raw);
         if (!name) return EMPTY;
         const theme = get().themes.find((t) => t.id === themeId);
-        if (!theme) return { ok: false, error: '상위 테마를 찾을 수 없어요.' };
+        if (!theme) return { ok: false, error: '상위 카테고리를 찾을 수 없어요.' };
         if (hasName(theme.subs.map((x) => x.name), name)) return DUP;
         set((s) => ({
           themes: s.themes.map((t) => (t.id === themeId ? { ...t, subs: [...t.subs, { id: uid('s'), name }] } : t)),
@@ -61,7 +61,7 @@ export const useThemeStore = create<ThemeState>()(
         const name = cleanThemeName(raw);
         if (!name) return EMPTY;
         const theme = get().themes.find((t) => t.id === themeId);
-        if (!theme) return { ok: false, error: '상위 테마를 찾을 수 없어요.' };
+        if (!theme) return { ok: false, error: '상위 카테고리를 찾을 수 없어요.' };
         if (hasName(theme.subs.map((x) => x.name), name, theme.subs.findIndex((x) => x.id === subId))) return DUP;
         set((s) => ({
           themes: s.themes.map((t) =>

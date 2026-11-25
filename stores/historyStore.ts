@@ -26,6 +26,14 @@ export const useHistoryStore = create<HistoryState>()(
         ),
       remove: (id) => set((s) => ({ history: s.history.filter((h) => h.id !== id) })),
     }),
-    { name: 'history_v2', storage: createJSONStorage(() => AsyncStorage) }
+    {
+      name: 'history_v2',
+      storage: createJSONStorage(() => AsyncStorage),
+      // 없어진 '임시저장' 상태의 예전 항목은 불러올 때 정리
+      merge: (persisted, current) => {
+        const saved = (persisted as Partial<HistoryState> | undefined)?.history ?? [];
+        return { ...current, history: saved.filter((h) => h.publishStatus === 'generated' || h.publishStatus === 'published') };
+      },
+    }
   )
 );

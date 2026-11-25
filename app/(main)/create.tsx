@@ -14,6 +14,7 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import { PlaceSearch } from '@/components/ui/PlaceSearch';
 import { PhotoList } from '@/components/ui/PhotoList';
 import { StarRating } from '@/components/ui/StarRating';
+import { ThemeSelector } from '@/components/ui/ThemeSelector';
 import { PresetSelector } from '@/components/ui/PresetSelector';
 import { Button } from '@/components/ui/Button';
 import { ScreenHeader } from '@/components/layout/ScreenHeader';
@@ -32,12 +33,12 @@ export default function CreateScreen() {
   const hasGeminiKey = useAuthStore((s) => s.hasGeminiKey);
   // 필요한 값만 구독해 입력 중 불필요한 전체 리렌더를 줄임
   const {
-    photos, placeName, place, showMap, rating, summary, notes, extraPrompt, genStatus,
+    photos, placeName, place, showMap, rating, summary, notes, extraPrompt, customTitle, genStatus, labels,
     addPhotos, removePhoto, movePhoto, setPhotoNote, setPhotoJoin, joinPhoto, setField, startGeneration,
   } = usePostStore(
     useShallow((s) => ({
       photos: s.photos, placeName: s.placeName, place: s.place, showMap: s.showMap, rating: s.rating,
-      summary: s.summary, notes: s.notes, extraPrompt: s.extraPrompt, genStatus: s.genStatus,
+      summary: s.summary, notes: s.notes, extraPrompt: s.extraPrompt, customTitle: s.customTitle, genStatus: s.genStatus, labels: s.labels,
       addPhotos: s.addPhotos, removePhoto: s.removePhoto, movePhoto: s.movePhoto, setPhotoNote: s.setPhotoNote,
       setPhotoJoin: s.setPhotoJoin, joinPhoto: s.joinPhoto, setField: s.setField, startGeneration: s.startGeneration,
     }))
@@ -166,6 +167,15 @@ export default function CreateScreen() {
             <StarRating value={rating} onChange={(v) => setField({ rating: v })} />
           </Field>
 
+          <Field label="제목" tag="optional" hint="비워 두면 AI가 장소·내용에 맞춰 지어줘요. 입력하면 그 제목 그대로 쓰여요.">
+            <TextField
+              placeholder="예) 성수동 ○○카페 후기"
+              value={customTitle}
+              onChangeText={(t) => setField({ customTitle: t })}
+              maxLength={80}
+            />
+          </Field>
+
           <Field label="한줄평" tag="optional">
             <TextField
               placeholder="예) 분위기는 최고인데 직원이 좀 불친절했어요"
@@ -183,6 +193,10 @@ export default function CreateScreen() {
               multiline
               maxLength={300}
             />
+          </Field>
+
+          <Field label="카테고리" tag="optional" hint="고른 카테고리가 블로그 글 분류(라벨)로 붙어요. 하위 카테고리는 '상위/하위' 형태예요. 글 생성 후 미리보기에서도 바꿀 수 있어요.">
+            <ThemeSelector labels={labels} onChange={(l) => setField({ labels: l })} hideTitle />
           </Field>
 
           <Field label="글쓰기 스타일">

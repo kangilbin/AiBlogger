@@ -13,7 +13,6 @@ const base = {
   title: '  ',
   body: '본문\n\n[[사진1]]', // 사진2 마커 누락
   labels: ['a'],
-  isDraft: false,
 };
 
 beforeEach(() => {

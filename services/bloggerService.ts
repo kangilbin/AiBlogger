@@ -19,14 +19,14 @@ export async function listBlogs(): Promise<BlogInfo[]> {
 
 export async function createPost(
   blogId: string,
-  params: { title: string; html: string; labels: string[]; isDraft: boolean }
+  params: { title: string; html: string; labels: string[] }
 ): Promise<{ id: string; url: string }> {
   if (IS_MOCK) {
     await new Promise((r) => setTimeout(r, 800));
     return { id: String(Date.now()), url: `${MOCK_BLOG.url}/mock-post` };
   }
   const res = await googleFetch(
-    `${BLOGGER_API}/blogs/${blogId}/posts?isDraft=${params.isDraft}`,
+    `${BLOGGER_API}/blogs/${blogId}/posts`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

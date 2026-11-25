@@ -28,6 +28,8 @@ interface PostState {
   summary: string;
   notes: string;
   extraPrompt: string;
+  /** 직접 정한 제목(선택). 비우면 AI가 만듦 */
+  customTitle: string;
 
   // 생성 결과
   title: string;
@@ -51,7 +53,7 @@ interface PostState {
   setPhotoJoin: (index: number, join: boolean) => void;
   /** from 사진을 to 사진의 묶음으로 옮김 (드래그앤드랍) */
   joinPhoto: (from: number, to: number) => void;
-  setField: (patch: Partial<Pick<PostState, 'placeName' | 'place' | 'showMap' | 'rating' | 'summary' | 'notes' | 'extraPrompt' | 'title' | 'body' | 'labels'>>) => void;
+  setField: (patch: Partial<Pick<PostState, 'placeName' | 'place' | 'showMap' | 'rating' | 'summary' | 'notes' | 'extraPrompt' | 'customTitle' | 'title' | 'body' | 'labels'>>) => void;
 
   /** 현재 글을 '작성됨(미발행)'으로 이력에 저장/갱신 */
   saveDraft: () => void;
@@ -60,7 +62,7 @@ interface PostState {
   loadFromHistory: (item: PostHistory) => boolean;
   startGeneration: () => void;
   dismissGeneration: () => void;
-  publish: (isDraft: boolean) => Promise<{ ok: true; url: string } | Extract<Result, { ok: false }>>;
+  publish: () => Promise<{ ok: true; url: string } | Extract<Result, { ok: false }>>;
   resetForm: () => void;
 }
 
@@ -73,6 +75,7 @@ const formInitial = {
   summary: '',
   notes: '',
   extraPrompt: '',
+  customTitle: '',
   title: '',
   body: '',
   labels: [] as string[],
@@ -121,7 +124,7 @@ export const usePostStore = create<PostState>((set, get) => ({
       publishStatus: 'generated',
       snapshot: {
         photos: s.photos, place: s.place, showMap: s.showMap,
-        summary: s.summary, notes: s.notes, extraPrompt: s.extraPrompt,
+        summary: s.summary, notes: s.notes, extraPrompt: s.extraPrompt, customTitle: s.customTitle,
       },
       createdAt: useHistoryStore.getState().history.find((h) => h.id === id)?.createdAt ?? new Date().toISOString(),
     });
@@ -152,6 +155,7 @@ export const usePostStore = create<PostState>((set, get) => ({
       summary: snap?.summary ?? '',
       notes: snap?.notes ?? '',
       extraPrompt: snap?.extraPrompt ?? '',
+      customTitle: snap?.customTitle ?? '',
       placeName: item.placeName,
       rating: item.rating,
       title: item.title,
@@ -179,13 +183,14 @@ export const usePostStore = create<PostState>((set, get) => ({
       summary: s.summary,
       notes: s.notes,
       extraPrompt: s.extraPrompt,
+      customTitle: s.customTitle,
       preset: useSettingsStore.getState().selectedPreset(),
     })
       .then((post) => {
         // 사용자가 고른 테마 라벨은 다시 생성해도 유지
         const known = allThemeLabels(useThemeStore.getState().themes);
         const picked = get().labels.find((l) => known.includes(l)) ?? null;
-        set({ title: post.title, body: post.body, labels: applyThemeLabel(post.labels, picked, known), alts: post.alts ?? [], genStatus: 'done' });
+        set({ title: get().customTitle.trim() || post.title, body: post.body, labels: applyThemeLabel(post.labels, picked, known), alts: post.alts ?? [], genStatus: 'done' });
         get().saveDraft();
         notifyIfBackground(place, true);
       })
@@ -197,7 +202,7 @@ export const usePostStore = create<PostState>((set, get) => ({
 
   dismissGeneration: () => set({ genStatus: 'idle', genError: null }),
 
-  publish: async (isDraft) => {
+  publish: async () => {
     const s = get();
     const blog = useAuthStore.getState().blog;
     if (!blog) return { ok: false, error: '발행할 블로그를 먼저 선택해주세요.', code: 'BLOG_NOT_SELECTED' };
@@ -212,7 +217,6 @@ export const usePostStore = create<PostState>((set, get) => ({
         body: s.body,
         labels: s.labels,
         alts: s.alts,
-        isDraft,
         onProgress: (m) => set({ publishProgress: m }),
       });
       // 발행되면 '작성됨' 임시 항목은 발행 항목으로 대체
@@ -228,7 +232,7 @@ export const usePostStore = create<PostState>((set, get) => ({
         title: res.title,
         body: res.body,
         labels: s.labels,
-        publishStatus: isDraft ? 'draft' : 'published',
+        publishStatus: 'published',
         postUrl: res.url,
         createdAt: new Date().toISOString(),
       });
