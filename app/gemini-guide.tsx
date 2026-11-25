@@ -23,16 +23,16 @@ import { Touchable } from '@/components/ui/Touchable';
 const AI_STUDIO_URL = 'https://aistudio.google.com/app/apikey';
 
 const STEPS = [
-  { title: 'Google AI Studio 열기', desc: '아래 버튼을 누르면 브라우저가 열려요. 블로그에 쓰는 구글 계정과 같은 계정으로 로그인하면 편해요.' },
-  { title: '"API 키 만들기" 누르기', desc: '화면의 [API 키 만들기] 버튼을 누르고, 프로젝트를 물어보면 아무거나(없으면 "새 프로젝트")를 선택하세요.' },
-  { title: '만들어진 키 복사하기', desc: '"AIza"로 시작하는 긴 문자열이 키예요. 복사 아이콘을 눌러 복사하세요.' },
+  { title: 'Google AI Studio 열기', desc: '아래 버튼을 누르면 브라우저가 열립니다. 블로그에 사용하는 구글 계정과 같은 계정으로 로그인하는 것을 권장합니다.' },
+  { title: '"API 키 만들기" 누르기', desc: '화면의 [API 키 만들기] 버튼을 누르고, 프로젝트를 묻는 경우 아무 프로젝트(없으면 "새 프로젝트")를 선택하세요.' },
+  { title: '만들어진 키 복사하기', desc: '"AIza"로 시작하는 긴 문자열이 키입니다. 복사 아이콘을 눌러 복사하세요.' },
   { title: '이 앱으로 돌아와 붙여넣기', desc: '아래 [붙여넣기] 버튼을 누르고 [확인하고 저장]을 누르면 끝!' },
 ];
 
 const FAQ = [
-  { q: '정말 무료인가요?', a: '네. 무료 사용량 안에서는 결제 수단 등록 없이 쓸 수 있어요. 한도를 넘으면 잠시 후 다시 시도하면 됩니다.' },
-  { q: '내 키는 안전한가요?', a: '키는 이 기기의 보안 저장소에만 저장되고 우리 서버로 보내지 않아요 (서버가 없어요). 다른 사람에게 키를 공유하지는 마세요.' },
-  { q: '키를 잘못 만들었거나 유출됐어요', a: 'AI Studio에서 해당 키를 삭제하고 새로 만든 뒤, 설정에서 다시 등록하면 돼요.' },
+  { q: '정말 무료입니까?', a: '네. 무료 사용량 범위 내에서는 결제 수단 등록 없이 사용할 수 있습니다. 한도를 초과하면 잠시 후 다시 시도해 주세요.' },
+  { q: '내 키는 안전합니까?', a: '키는 이 기기의 보안 저장소에만 저장되며 외부 서버로 전송되지 않습니다. 다른 사람에게 키를 공유하지 마세요.' },
+  { q: '키를 잘못 만들었거나 유출된 경우', a: 'AI Studio에서 해당 키를 삭제하고 새로 만든 뒤, 설정에서 다시 등록하세요.' },
 ];
 
 export default function GeminiGuideScreen() {
@@ -47,17 +47,17 @@ export default function GeminiGuideScreen() {
   const paste = async () => {
     const text = cleanGeminiKey(await Clipboard.getStringAsync());
     if (!text) {
-      Alert.alert('클립보드가 비어 있어요', '먼저 AI Studio에서 키를 복사해주세요.');
+      Alert.alert('클립보드가 비어 있습니다', '먼저 AI Studio에서 키를 복사해 주세요.');
       return;
     }
     setKey(text);
-    setError(looksLikeGeminiKey(text) ? null : '키가 너무 짧거나 이상한 문자가 섞여 있어요. 키 전체를 다시 복사해주세요.');
+    setError(looksLikeGeminiKey(text) ? null : '키가 너무 짧거나 올바르지 않은 문자가 포함되어 있습니다. 키 전체를 다시 복사해 주세요.');
   };
 
   const save = async () => {
     const k = cleanGeminiKey(key);
     if (!looksLikeGeminiKey(k)) {
-      setError('키 형식이 올바르지 않아요. 키 전체를 복사했는지 확인해주세요(공백 없이 20자 이상).');
+      setError('키 형식이 올바르지 않습니다. 키 전체를 복사했는지 확인해 주세요(공백 없이 20자 이상).');
       return;
     }
     setBusy(true);
@@ -65,16 +65,16 @@ export default function GeminiGuideScreen() {
     try {
       const ok = await validateGeminiKey(k);
       if (!ok) {
-        setError('구글이 이 키를 거부했어요. 키를 다시 복사하거나, AI Studio에서 새 키를 만들어주세요.');
+        setError('구글에서 이 키를 거부했습니다. 키를 다시 복사하거나 AI Studio에서 새 키를 만들어 주세요.');
         return;
       }
       await saveGeminiKey(k);
       setKey('');
-      Alert.alert('등록 완료', 'Gemini 키가 등록됐어요. 이제 글을 만들 수 있어요!', [
+      Alert.alert('등록 완료', 'Gemini 키가 등록되었습니다. 이제 글을 작성할 수 있습니다.', [
         { text: '확인', onPress: () => router.back() },
       ]);
     } catch (e) {
-      setError(errorMessage(e, '저장에 실패했어요. 다시 시도해주세요.'));
+      setError(errorMessage(e, '저장에 실패했습니다. 다시 시도해 주세요.'));
     } finally {
       setBusy(false);
     }
@@ -86,10 +86,10 @@ export default function GeminiGuideScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={styles.intro}>
-            <Text style={Typo.display}>AI가 글을 쓰려면{'\n'}키가 필요해요</Text>
+            <Text style={Typo.display}>AI 글 작성에{'\n'}키가 필요합니다</Text>
             <Text style={styles.introDesc}>
-              내 구글 계정으로 발급한 Gemini API 키가 필요해요. 발급은 무료이고, 한 번만 등록하면 계속 쓸 수 있어요.
-              {hasKey ? '\n이미 등록된 키가 있어요. 새 키를 등록하면 교체돼요.' : ''}
+              내 구글 계정으로 발급한 Gemini API 키가 필요합니다. 발급은 무료이며, 한 번만 등록하면 계속 사용할 수 있습니다.
+              {hasKey ? '\n이미 등록된 키가 있습니다. 새 키를 등록하면 교체됩니다.' : ''}
             </Text>
           </View>
 
@@ -115,7 +115,7 @@ export default function GeminiGuideScreen() {
                 error={!!error}
                 value={key}
                 onChangeText={(t) => { setKey(t); setError(null); }}
-                placeholder="여기에 키를 붙여넣으세요"
+                placeholder="여기에 키를 붙여넣어 주세요"
                 autoCapitalize="none"
                 autoCorrect={false}
                 secureTextEntry={!show}

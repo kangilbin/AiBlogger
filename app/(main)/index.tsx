@@ -46,7 +46,7 @@ export default function HomeScreen() {
   const hasDraft = usePostStore((s) => !!s.body && s.genStatus !== 'running');
   const openDraft = (item: PostHistory) => {
     if (!usePostStore.getState().loadFromHistory(item)) {
-      Alert.alert('글 작성 중', '다른 글을 AI가 작성하고 있어요. 완료된 뒤에 열어주세요.');
+      Alert.alert('글 작성 중', '다른 글을 AI가 작성하고 있습니다. 완료된 후에 열어 주세요.');
       return;
     }
     router.push('/(main)/preview');
@@ -69,22 +69,22 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.greeting}>
           <Text style={Typo.display}>안녕하세요,{'\n'}{user?.name ?? ''}님</Text>
-          <Text style={styles.greetingSub}>오늘은 어디를 다녀오셨나요?</Text>
+          <Text style={styles.greetingSub}>오늘은 어디를 다녀오셨습니까?</Text>
         </View>
 
         {hasDraft && (
           <NoticeCard
             icon="document-text-outline"
             title="작성 중인 글 이어서 보기"
-            desc={draftPlace || '미리보기에서 수정하고 발행하세요'}
+            desc={draftPlace || '미리보기에서 수정 후 발행하세요'}
             onPress={() => router.push('/(main)/preview')}
           />
         )}
         {!hasGeminiKey && (
           <NoticeCard
             icon="key-outline"
-            title="Gemini API 키를 등록해주세요"
-            desc="글을 쓰는 AI를 쓰려면 필요해요"
+            title="Gemini API 키를 등록해 주세요"
+            desc="AI 글 작성에 필요합니다"
             onPress={() => router.push('/gemini-guide')}
           />
         )}
@@ -117,8 +117,8 @@ export default function HomeScreen() {
         ) : (
           <View style={styles.empty}>
             <Ionicons name="camera-outline" size={40} color={Colors.textDisabled} />
-            <Text style={styles.emptyTitle}>아직 작성된 글이 없어요</Text>
-            <Text style={styles.emptyDesc}>사진과 별점만 입력하면{'\n'}AI가 블로그 글을 대신 써드려요</Text>
+            <Text style={styles.emptyTitle}>작성된 글이 없습니다</Text>
+            <Text style={styles.emptyDesc}>사진과 별점만 입력하면{'\n'}AI가 블로그 글을 대신 작성해 드립니다</Text>
           </View>
         )}
       </ScrollView>

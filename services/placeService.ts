@@ -24,9 +24,9 @@ async function searchKakao(query: string, signal?: AbortSignal): Promise<PlaceIn
     { signal, headers: { Authorization: `KakaoAK ${KAKAO_REST_KEY}` } }
   );
   if (res.status === 401 || res.status === 403) {
-    throw new AppError('UNKNOWN', '카카오 키가 올바르지 않거나 카카오맵 사용 설정이 꺼져 있어요.');
+    throw new AppError('UNKNOWN', '카카오 키가 올바르지 않거나 카카오맵 사용 설정이 꺼져 있습니다.');
   }
-  if (!res.ok) throw new AppError('UNKNOWN', `장소 검색에 실패했어요 (${res.status})`);
+  if (!res.ok) throw new AppError('UNKNOWN', `장소 검색에 실패했습니다 (${res.status})`);
   const j = (await res.json()) as KakaoResponse;
   return (j.documents ?? []).map((d) => ({
     name: d.place_name,
@@ -48,7 +48,7 @@ async function searchFree(query: string, signal?: AbortSignal): Promise<PlaceInf
   const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=6&lang=default`;
   // 공개 무료 서버는 기본 접속 표시(okhttp)를 차단하므로 앱을 식별하는 User-Agent를 보낸다
   const res = await fetch(url, { signal, headers: { Accept: 'application/json', 'User-Agent': 'AIBlogerApp/1.0' } });
-  if (!res.ok) throw new AppError('UNKNOWN', `장소 검색에 실패했어요 (${res.status})`);
+  if (!res.ok) throw new AppError('UNKNOWN', `장소 검색에 실패했습니다 (${res.status})`);
   const j = (await res.json()) as PhotonResponse;
   return (j.features ?? [])
     .filter((f) => f.properties.name && f.geometry?.coordinates?.length === 2)
@@ -73,6 +73,6 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
   } catch (e) {
     if ((e as Error).name === 'AbortError') throw e;
     if (e instanceof AppError) throw e;
-    throw new AppError('NETWORK', '네트워크 연결을 확인해주세요.');
+    throw new AppError('NETWORK', '네트워크 연결을 확인해 주세요.');
   }
 }

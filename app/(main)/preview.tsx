@@ -62,7 +62,7 @@ export default function PreviewScreen() {
     // 탭 화면은 안 보일 때도 마운트되어 있으므로, 이 화면을 보고 있을 때만 처리 (아니면 배너가 처리)
     if (!isFocused) return;
     if (genStatus === 'error') {
-      Alert.alert('재생성 실패', genError ?? '다시 시도해주세요.');
+      Alert.alert('재생성 실패', genError ?? '다시 시도해 주세요.');
       dismissGeneration();
     } else if (genStatus === 'done') {
       dismissGeneration();
@@ -98,7 +98,7 @@ export default function PreviewScreen() {
           {isEditing ? (
             <View style={{ gap: 12 }}>
               <TextField style={styles.titleInput} value={title} onChangeText={(t) => setField({ title: t })} placeholder="제목" multiline />
-              <Text style={styles.editHint}>사진 위치는 [[사진N]] 줄이에요(줄을 옮기면 위치가 바뀌어요). ## 소제목, **굵게**, {'>'} 인용, - 목록, --- 구분선을 쓸 수 있어요.</Text>
+              <Text style={styles.editHint}>사진 위치는 [[사진N]] 줄입니다(줄을 옮기면 위치가 변경됩니다). ## 소제목, **굵게**, {'>'} 인용, - 목록, --- 구분선을 사용할 수 있습니다.</Text>
               <TextField
                 style={styles.editableText}
                 value={body}
@@ -116,7 +116,7 @@ export default function PreviewScreen() {
                   <View style={{ flex: 1, gap: 2 }}>
                     <Text style={styles.mapTitle}>위치 지도</Text>
                     <Text style={Typo.caption}>
-                      발행하면 글 맨 아래에 '{place?.name ?? placeName}' 구글 지도가 붙어요{place?.address ? `\n${place.address}` : ''}.
+                      발행하면 글 맨 아래에 '{place?.name ?? placeName}' 구글 지도가 첨부됩니다{place?.address ? `\n${place.address}` : ''}.
                     </Text>
                   </View>
                 </View>

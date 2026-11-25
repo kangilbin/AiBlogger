@@ -205,7 +205,7 @@ export const usePostStore = create<PostState>((set, get) => ({
   publish: async () => {
     const s = get();
     const blog = useAuthStore.getState().blog;
-    if (!blog) return { ok: false, error: '발행할 블로그를 먼저 선택해주세요.', code: 'BLOG_NOT_SELECTED' };
+    if (!blog) return { ok: false, error: '발행할 블로그를 먼저 선택해 주세요.', code: 'BLOG_NOT_SELECTED' };
 
     try {
       const res = await publishToBlogger({

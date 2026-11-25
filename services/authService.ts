@@ -36,9 +36,9 @@ export async function signInWithGoogle(): Promise<GoogleLoginResult | null> {
   } catch (e) {
     if (isErrorWithCode(e) && e.code === statusCodes.SIGN_IN_CANCELLED) return null;
     if (isErrorWithCode(e) && e.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-      throw new AppError('LOGIN_FAILED', 'Google Play 서비스를 사용할 수 없어요.');
+      throw new AppError('LOGIN_FAILED', 'Google Play 서비스를 사용할 수 없습니다.');
     }
-    throw new AppError('LOGIN_FAILED', e instanceof Error ? e.message : '로그인 중 오류가 발생했어요.');
+    throw new AppError('LOGIN_FAILED', e instanceof Error ? e.message : '로그인 중 오류가 발생했습니다.');
   }
 }
 

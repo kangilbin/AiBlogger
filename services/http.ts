@@ -3,7 +3,7 @@ import { AppError } from './errors';
 import { refreshAccessToken } from './authService';
 import { IS_MOCK } from '@/constants/config';
 
-const expired = () => new AppError('SESSION_EXPIRED', '로그인이 만료되었어요. 다시 로그인해주세요.');
+const expired = () => new AppError('SESSION_EXPIRED', '로그인이 만료되었습니다. 다시 로그인해 주세요.');
 
 // 동시에 여러 요청이 만료를 만나도 갱신은 한 번만
 let refreshing: Promise<string | null> | null = null;
@@ -27,7 +27,7 @@ async function send(url: string, init: RequestInit, token: string): Promise<Resp
       headers: { ...(init.headers as Record<string, string>), Authorization: `Bearer ${token}` },
     });
   } catch {
-    throw new AppError('NETWORK', '네트워크 연결을 확인해주세요.');
+    throw new AppError('NETWORK', '네트워크 연결을 확인해 주세요.');
   }
 }
 

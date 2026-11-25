@@ -83,7 +83,7 @@ async function callModel(model: string, key: string, body: object): Promise<Atte
   } catch (e) {
     // 응답이 너무 늦으면 혼잡으로 보고 다른 모델/다음 라운드로 재시도
     if ((e as Error)?.name === 'AbortError') return { ok: false, next: true, reason: 'overloaded' };
-    return { ok: false, next: false, error: new AppError('NETWORK', '네트워크 연결을 확인해주세요.') };
+    return { ok: false, next: false, error: new AppError('NETWORK', '네트워크 연결을 확인해 주세요.') };
   }
 
   if (res.ok) {
@@ -106,7 +106,7 @@ async function callModel(model: string, key: string, body: object): Promise<Atte
   if (res.status === 500 || res.status === 502 || res.status === 503 || res.status === 504) {
     return { ok: false, next: true, reason: 'overloaded' };
   }
-  if (res.status === 404) return { ok: false, next: true, reason: 'missing', detail: `모델 ${model}을(를) 찾을 수 없어요.` };
+  if (res.status === 404) return { ok: false, next: true, reason: 'missing', detail: `모델 ${model}을(를) 찾을 수 없습니다.` };
 
   const j = await res.json().catch(() => null);
   const msg: string = j?.error?.message ?? '';
@@ -114,10 +114,10 @@ async function callModel(model: string, key: string, body: object): Promise<Atte
     return {
       ok: false,
       next: false,
-      error: new AppError('GEMINI_KEY_INVALID', 'Gemini API 키가 올바르지 않아요. 설정에서 다시 등록해주세요.'),
+      error: new AppError('GEMINI_KEY_INVALID', 'Gemini API 키가 올바르지 않습니다. 설정에서 다시 등록해 주세요.'),
     };
   }
-  if (res.status === 400) return { ok: false, next: true, reason: 'bad-request', detail: msg || '요청이 거부되었어요.' }; // 이미지 미지원 등 → 다음 모델
+  if (res.status === 400) return { ok: false, next: true, reason: 'bad-request', detail: msg || '요청이 거부되었습니다.' }; // 이미지 미지원 등 → 다음 모델
   return { ok: false, next: false, error: new AppError('UNKNOWN', `글 생성 실패 (${res.status})`) };
 }
 
@@ -128,7 +128,7 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
   }
 
   const key = await geminiKeyStorage.get();
-  if (!key) throw new AppError('GEMINI_KEY_MISSING', 'Gemini API 키를 먼저 등록해주세요.');
+  if (!key) throw new AppError('GEMINI_KEY_MISSING', 'Gemini API 키를 먼저 등록해 주세요.');
 
   // 병렬 인코딩하되 Promise.all이 순서를 보장하므로 사진 순서는 유지됨
   const encoded = await Promise.all(input.photos.map((p) => prepareImage(p.uri, 896, 0.7)));
@@ -186,23 +186,23 @@ export async function generatePost(input: PostInput): Promise<GeneratedPost> {
   if (text === null) {
     // 마지막 라운드에서 혼잡(503)이 있었다면 원인은 서버 혼잡 — 재시도 중 일부 모델이 분당 한도(429)에 걸렸어도 한도 초과로 안내하지 않음
     if (sawOverload)
-      throw new AppError('UNKNOWN', 'Gemini 서버가 혼잡해 여러 번 재시도했지만 실패했어요(503). 사용량 한도 문제가 아니에요. 1~2분 뒤 다시 시도해주세요.');
+      throw new AppError('UNKNOWN', 'Gemini 서버가 혼잡하여 여러 번 재시도했지만 실패했습니다(503). 사용량 한도 문제가 아닙니다. 1~2분 후 다시 시도해 주세요.');
     if (sawQuota)
       throw new AppError(
         'GEMINI_QUOTA',
-        `요청 한도에 걸렸어요. 1분 정도 뒤에 다시 시도해주세요.${quotaDetail ? `\n\n(구글 응답: ${quotaDetail.slice(0, 200)})` : ''}`
+        `요청 한도에 도달했습니다. 1분 정도 후 다시 시도해 주세요.${quotaDetail ? `\n\n(구글 응답: ${quotaDetail.slice(0, 200)})` : ''}`
       );
     // 요청 자체가 거부된 경우(모든 모델이 400/404)는 실제 사유를 보여줘서 원인을 알 수 있게 함
     if (lastDetail)
-      throw new AppError('UNKNOWN', `글 생성 요청이 거부되었어요: ${lastDetail.slice(0, 160)}`);
-    throw new AppError('GEMINI_BLOCKED', '안전 정책 등으로 글을 생성하지 못했어요. 사진이나 메모를 바꿔 다시 시도해주세요.');
+      throw new AppError('UNKNOWN', `글 생성 요청이 거부되었습니다: ${lastDetail.slice(0, 160)}`);
+    throw new AppError('GEMINI_BLOCKED', '안전 정책 등으로 글을 생성하지 못했습니다. 사진이나 메모를 변경하여 다시 시도해 주세요.');
   }
 
   let parsed: GeneratedPost;
   try {
     parsed = JSON.parse(text);
   } catch {
-    throw new AppError('UNKNOWN', 'AI 응답을 해석하지 못했어요. 다시 생성해주세요.');
+    throw new AppError('UNKNOWN', 'AI 응답을 해석하지 못했습니다. 다시 생성해 주세요.');
   }
   return {
     title: parsed.title?.trim() || input.placeName,
@@ -236,9 +236,9 @@ export async function validateGeminiKey(key: string): Promise<boolean> {
       headers: { 'x-goog-api-key': cleanGeminiKey(key) },
     });
   } catch {
-    throw new AppError('NETWORK', '네트워크 연결을 확인해주세요.');
+    throw new AppError('NETWORK', '네트워크 연결을 확인해 주세요.');
   }
   if (res.ok) return true;
   if (res.status === 400 || res.status === 401 || res.status === 403) return false;
-  throw new AppError('UNKNOWN', `키 확인에 실패했어요 (${res.status}). 잠시 후 다시 시도해주세요.`);
+  throw new AppError('UNKNOWN', `키 확인에 실패했습니다 (${res.status}). 잠시 후 다시 시도해 주세요.`);
 }

@@ -48,7 +48,7 @@ export default function ThemesScreen() {
 
   const confirmDeleteTheme = () => {
     if (!open) return;
-    Alert.alert('카테고리 삭제', `"${open.name}"와 하위 카테고리를 삭제할까요?\n이미 발행한 글의 라벨은 그대로 남아요.`, [
+    Alert.alert('카테고리 삭제', `"${open.name}"와 하위 카테고리를 삭제하시겠습니까?\n이미 발행한 글의 라벨은 그대로 유지됩니다.`, [
       { text: '취소', style: 'cancel' },
       { text: '삭제', style: 'destructive', onPress: () => { store.deleteTheme(open.id); setOpenId(null); } },
     ]);
@@ -65,7 +65,7 @@ export default function ThemesScreen() {
                 <TextField value={nameDraft} onChangeText={setNameDraft} onEndEditing={saveName} onBlur={saveName} maxLength={20} />
               </Field>
 
-              <Field label="하위 카테고리" hint="글을 발행하면 '상위/하위' 라벨로 붙어요.">
+              <Field label="하위 카테고리" hint="글을 발행하면 '상위/하위' 라벨로 지정됩니다.">
                 {open.subs.map((s) => (
                   <ListRow
                     key={s.id}
@@ -75,7 +75,7 @@ export default function ThemesScreen() {
                       <Touchable
                         hitSlop={10}
                         onPress={() =>
-                          Alert.alert('하위 카테고리 삭제', `"${s.name}"를 삭제할까요?`, [
+                          Alert.alert('하위 카테고리 삭제', `"${s.name}"를 삭제하시겠습니까?`, [
                             { text: '취소', style: 'cancel' },
                             { text: '삭제', style: 'destructive', onPress: () => store.deleteSub(open.id, s.id) },
                           ])
@@ -97,9 +97,9 @@ export default function ThemesScreen() {
           ) : (
             <>
               <Text style={Typo.caption}>
-                글을 쓸 때 고른 카테고리가 블로그 라벨로 붙어요. 이름을 바꾸거나 삭제해도 이미 발행된 글의 라벨은 바뀌지 않아요.
+                글 작성 시 선택한 카테고리가 블로그 라벨로 지정됩니다. 이름을 변경하거나 삭제해도 이미 발행된 글의 라벨은 변경되지 않습니다.
               </Text>
-              {store.themes.length === 0 && <Text style={styles.empty}>아직 카테고리가 없어요. 아래에서 추가해보세요.</Text>}
+              {store.themes.length === 0 && <Text style={styles.empty}>등록된 카테고리가 없습니다. 아래에서 추가해 주세요.</Text>}
               <View>
                 {store.themes.map((t) => (
                   <ListRow

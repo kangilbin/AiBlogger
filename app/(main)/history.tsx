@@ -53,7 +53,7 @@ export default function HistoryScreen() {
         onPress={() => {
           if (item.publishStatus === 'generated') {
             if (!loadFromHistory(item)) {
-              Alert.alert('글 작성 중', '다른 글을 AI가 작성하고 있어요. 완료된 뒤에 열어주세요.');
+              Alert.alert('글 작성 중', '다른 글을 AI가 작성하고 있습니다. 완료된 후에 열어 주세요.');
               return;
             }
             router.push('/(main)/preview');
@@ -62,7 +62,7 @@ export default function HistoryScreen() {
           }
         }}
         onLongPress={() =>
-          Alert.alert('이력 삭제', `'${item.placeName}' 기록을 삭제할까요?`, [
+          Alert.alert('이력 삭제', `'${item.placeName}' 기록을 삭제하시겠습니까?`, [
             { text: '취소', style: 'cancel' },
             { text: '삭제', style: 'destructive', onPress: () => remove(item.id) },
           ])
@@ -78,8 +78,8 @@ export default function HistoryScreen() {
       {history.length === 0 ? (
         <View style={styles.center}>
           <Ionicons name="time-outline" size={40} color={Colors.textDisabled} />
-          <Text style={styles.emptyTitle}>작성 이력이 없어요</Text>
-          <Text style={styles.emptyDesc}>글을 작성하면 여기에 표시돼요</Text>
+          <Text style={styles.emptyTitle}>작성 이력이 없습니다</Text>
+          <Text style={styles.emptyDesc}>글을 작성하면 여기에 표시됩니다</Text>
         </View>
       ) : (
         <FlatList

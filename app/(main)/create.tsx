@@ -84,15 +84,15 @@ export default function CreateScreen() {
   };
 
   const validate = () => {
-    if (photos.length === 0) { Alert.alert('사진 필요', '사진을 최소 1장 추가해주세요.'); return false; }
-    if (!placeName.trim()) { setPlaceError('장소명을 입력해주세요.'); return false; }
-    if (rating === 0) { Alert.alert('별점 필요', '별점을 선택해주세요.'); return false; }
+    if (photos.length === 0) { Alert.alert('사진 필요', '사진을 최소 1장 추가해 주세요.'); return false; }
+    if (!placeName.trim()) { setPlaceError('장소명을 입력해 주세요.'); return false; }
+    if (rating === 0) { Alert.alert('별점 필요', '별점을 선택해 주세요.'); return false; }
     return true;
   };
 
   const handleGenerate = () => {
     if (!hasGeminiKey) {
-      Alert.alert('Gemini 키 필요', 'AI(Gemini)가 글을 쓰려면 내 Gemini API 키가 필요해요. 발급 방법을 안내해 드릴게요.', [
+      Alert.alert('Gemini 키 필요', 'AI(Gemini)가 글을 쓰려면 내 Gemini API 키가 필요합니다. 발급 방법을 안내해 드리겠습니다.', [
         { text: '취소', style: 'cancel' },
         { text: '등록하러 가기', onPress: () => router.push('/gemini-guide') },
       ]);
@@ -113,7 +113,7 @@ export default function CreateScreen() {
         <View style={styles.lockBox}>
           <Ionicons name="hourglass-outline" size={40} color={Colors.textDisabled} />
           <Text style={styles.lockTitle}>글 작성 중...</Text>
-          <Text style={styles.lockDesc}>완료되면 상단에 알려드려요.</Text>
+          <Text style={styles.lockDesc}>완료되면 상단에 알려 드립니다.</Text>
         </View>
         <BottomBar>
           <Button label="홈으로" variant="secondary" onPress={() => router.replace('/(main)')} fullWidth />
@@ -128,12 +128,12 @@ export default function CreateScreen() {
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView ref={scrollRef} scrollEnabled={!dragging} scrollEventThrottle={16} onScroll={(e) => { scrollYRef.current = e.nativeEvent.contentOffset.y; }} style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          <Text style={Typo.display}>어디를{'\n'}다녀오셨나요?</Text>
+          <Text style={Typo.display}>어디를{'\n'}다녀오셨습니까?</Text>
 
           <Field
             label="사진"
             tag="required"
-            hint="글에 들어갈 순서대로 추가하세요. 같은 음식 사진처럼 한꺼번에 보여주고 싶으면 사진을 길게 눌러 묶을 사진 위로 끌어다 놓으세요. 사진마다 메모를 남기면 AI가 맥락에 맞춰 써줘요."
+            hint="글에 들어갈 순서대로 추가하세요. 같은 음식 사진처럼 함께 보여줄 사진은 길게 눌러 묶을 사진 위로 끌어다 놓으세요. 사진마다 메모를 남기면 AI가 맥락에 맞춰 작성합니다."
           >
             <PhotoList photos={photos} maxCount={MAX_PHOTOS} onAdd={handlePickImage} onRemove={removePhoto} onMove={movePhoto} onNote={setPhotoNote} onJoin={setPhotoJoin} onGroup={joinPhoto} onDragChange={setDragging} scrollRef={scrollRef} scrollYRef={scrollYRef} />
           </Field>
@@ -152,7 +152,7 @@ export default function CreateScreen() {
           <Field
             label="글에 지도 넣기"
             right={<Switch value={showMap} onValueChange={(v) => setField({ showMap: v })} trackColor={{ true: Colors.primary, false: Colors.fillStrong }} />}
-            hint={showMap ? '검색해서 고르면 발행할 때 글 맨 아래에 그 위치의 구글 지도가 붙어요. 고르지 않으면 장소명으로 지도를 검색해요.' : undefined}
+            hint={showMap ? '검색해서 고르면 발행할 때 글 맨 아래에 해당 위치의 구글 지도가 첨부됩니다. 선택하지 않으면 장소명으로 지도를 검색합니다.' : undefined}
           >
             {showMap && (
               <PlaceSearch
@@ -163,11 +163,15 @@ export default function CreateScreen() {
             )}
           </Field>
 
-          <Field label="별점" tag="required" hint="별점에 따라 글의 평가 톤이 달라져요. 낮으면 아쉬운 점 중심으로 써요.">
+          <Field label="별점" tag="required" hint="별점에 따라 글의 평가 톤이 달라집니다. 낮으면 아쉬운 점 중심으로 작성합니다.">
             <StarRating value={rating} onChange={(v) => setField({ rating: v })} />
           </Field>
 
-          <Field label="제목" tag="optional" hint="비워 두면 AI가 장소·내용에 맞춰 지어줘요. 입력하면 그 제목 그대로 쓰여요.">
+          <Field label="글쓰기 스타일">
+            <PresetSelector presets={presets} selectedId={selectedId} onSelect={selectPreset} onManage={() => router.push('/prompts')} />
+          </Field>
+
+          <Field label="제목" tag="optional" collapsible filled={!!customTitle.trim()} hint="비워 두면 AI가 장소와 내용에 맞춰 작성합니다. 입력하면 해당 제목이 그대로 사용됩니다.">
             <TextField
               placeholder="예) 성수동 ○○카페 후기"
               value={customTitle}
@@ -176,7 +180,11 @@ export default function CreateScreen() {
             />
           </Field>
 
-          <Field label="한줄평" tag="optional">
+          <Field label="카테고리" tag="optional" collapsible filled={labels.length > 0} hint="선택한 카테고리가 블로그 글 분류(라벨)로 지정됩니다. 하위 카테고리는 '상위/하위' 형태입니다. 글 생성 후 미리보기에서도 변경할 수 있습니다.">
+            <ThemeSelector labels={labels} onChange={(l) => setField({ labels: l })} hideTitle />
+          </Field>
+
+          <Field label="한줄평" tag="optional" collapsible filled={!!summary.trim()}>
             <TextField
               placeholder="예) 분위기는 최고인데 직원이 좀 불친절했어요"
               value={summary}
@@ -185,7 +193,7 @@ export default function CreateScreen() {
             />
           </Field>
 
-          <Field label="특이사항" tag="optional" right={<Text style={styles.count}>{notes.length}/300</Text>}>
+          <Field label="특이사항" tag="optional" collapsible filled={!!notes.trim()}>
             <TextField
               placeholder={'예) 매장이 지저분했음, 웨이팅 40분, 주차 불가'}
               value={notes}
@@ -195,15 +203,7 @@ export default function CreateScreen() {
             />
           </Field>
 
-          <Field label="카테고리" tag="optional" hint="고른 카테고리가 블로그 글 분류(라벨)로 붙어요. 하위 카테고리는 '상위/하위' 형태예요. 글 생성 후 미리보기에서도 바꿀 수 있어요.">
-            <ThemeSelector labels={labels} onChange={(l) => setField({ labels: l })} hideTitle />
-          </Field>
-
-          <Field label="글쓰기 스타일">
-            <PresetSelector presets={presets} selectedId={selectedId} onSelect={selectPreset} onManage={() => router.push('/prompts')} />
-          </Field>
-
-          <Field label="이번 글만 추가 요청" tag="optional">
+          <Field label="이번 글만 추가 요청" tag="optional" collapsible filled={!!extraPrompt.trim()}>
             <TextField
               placeholder={'예) 1000자 내외로, 마지막에 재방문 의사 포함'}
               value={extraPrompt}
@@ -226,7 +226,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.bg },
   scroll: { flex: 1 },
   content: { paddingHorizontal: SCREEN_PADDING, paddingTop: 8, paddingBottom: 32, gap: 32 },
-  count: Typo.caption,
   lockBox: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 32 },
   lockTitle: { ...Typo.title, marginTop: 8 },
   lockDesc: { ...Typo.body, color: Colors.textSecondary, textAlign: 'center' },

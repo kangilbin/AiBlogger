@@ -27,7 +27,7 @@ export default function BlogSelectScreen() {
     try {
       setBlogs(await listBlogs());
     } catch (e) {
-      setError(errorMessage(e, '블로그 목록을 불러오지 못했어요.'));
+      setError(errorMessage(e, '블로그 목록을 불러오지 못했습니다.'));
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ export default function BlogSelectScreen() {
         <View style={{ height: 56 }} />
       )}
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-        <Text style={Typo.display}>글을 올릴 블로그를{'\n'}선택해주세요</Text>
+        <Text style={Typo.display}>글을 올릴 블로그를{'\n'}선택해 주세요</Text>
         {loading ? (
           <ActivityIndicator color={Colors.primary} style={{ marginTop: 48 }} />
         ) : error ? (
@@ -66,14 +66,14 @@ export default function BlogSelectScreen() {
           </View>
         ) : blogs.length === 0 ? (
           <View style={styles.box}>
-            <Text style={Typo.heading}>아직 Blogger 블로그가 없어요</Text>
+            <Text style={Typo.heading}>Blogger 블로그가 없습니다</Text>
             <Text style={styles.desc}>
-              블로그는 Blogger에서만 만들 수 있어요. 1분이면 끝나요.
+              블로그는 Blogger에서만 만들 수 있습니다. 1분 정도 소요됩니다.
             </Text>
             <View style={styles.steps}>
               <Text style={styles.step}>1. 아래 버튼으로 Blogger를 열고 같은 구글 계정으로 로그인</Text>
               <Text style={styles.step}>2. "블로그 만들기"에서 제목과 주소(영문)를 정하고 완료</Text>
-              <Text style={styles.step}>3. 이 앱으로 돌아오면 자동으로 불러와요</Text>
+              <Text style={styles.step}>3. 이 앱으로 돌아오면 자동으로 불러옵니다</Text>
             </View>
             <Button label="새로고침" variant="secondary" onPress={() => load()} fullWidth />
           </View>
@@ -89,7 +89,7 @@ export default function BlogSelectScreen() {
                 onPress={() => pick(b)}
               />
             ))}
-            <Text style={styles.hint}>새 블로그를 만든 뒤 앱으로 돌아오면 목록에 자동으로 나타나요.</Text>
+            <Text style={styles.hint}>새 블로그를 만든 뒤 앱으로 돌아오면 목록에 자동으로 표시됩니다.</Text>
           </View>
         )}
       </ScrollView>

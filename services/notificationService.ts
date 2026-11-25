@@ -41,7 +41,7 @@ export async function notifyIfBackground(place: string, ok: boolean) {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: ok ? '블로그 글 작성 완료' : '블로그 글 작성 실패',
-        body: ok ? `'${place}' 글이 완성됐어요. 눌러서 확인하세요.` : `'${place}' 글 생성에 실패했어요. 다시 시도해주세요.`,
+        body: ok ? `'${place}' 글이 완성되었습니다. 눌러서 확인하세요.` : `'${place}' 글 생성에 실패했습니다. 다시 시도해 주세요.`,
       },
       trigger: null,
     });

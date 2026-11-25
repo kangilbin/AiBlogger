@@ -39,7 +39,7 @@ export function BlogDropdown({ open, top, onClose }: { open: boolean; top: numbe
     try {
       setBlogs(await listBlogs());
     } catch (e) {
-      setError(errorMessage(e, '블로그 목록을 불러오지 못했어요.'));
+      setError(errorMessage(e, '블로그 목록을 불러오지 못했습니다.'));
     } finally {
       setLoading(false);
     }

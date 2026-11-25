@@ -74,7 +74,7 @@ describe('주소 전달', () => {
 
 describe('블로그 최적화 지침', () => {
   const p = buildSystemPrompt(input);
-  it.each(['[제목 규칙]', '"alts"', '[글 구조]', '첫 문단'])('%s 를 포함한다', (k) => {
+  it.each(['[제목 규칙', '"alts"', '[글 구조]', '첫 문단'])('%s 를 포함한다', (k) => {
     expect(p).toContain(k);
   });
 });

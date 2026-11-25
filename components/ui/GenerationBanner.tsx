@@ -32,7 +32,7 @@ export function GenerationBanner() {
       ? `'${place}' 글 작성 중…`
       : status === 'done'
       ? `'${place}' 작성 완료 · 눌러서 확인`
-      : `작성 실패 · ${error ?? '다시 시도해주세요'}`;
+      : `작성 실패 · ${error ?? '다시 시도해 주세요'}`;
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { top: insets.top + 6 }]}>

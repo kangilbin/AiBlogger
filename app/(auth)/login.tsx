@@ -33,7 +33,7 @@ export default function LoginScreen() {
       <View style={styles.content}>
         <View style={styles.hero}>
           <Text style={styles.brand}>AI Bloger</Text>
-          <Text style={Typo.display}>사진만 올리면{'\n'}블로그 글이 완성돼요</Text>
+          <Text style={Typo.display}>사진만 올리면{'\n'}블로그 글이 완성됩니다</Text>
           <Text style={styles.sub}>방문한 곳의 사진과 별점만 남기세요.{'\n'}글쓰기는 AI가 대신합니다.</Text>
         </View>
 
@@ -62,7 +62,7 @@ export default function LoginScreen() {
             <Button label="개발 모드 로그인" variant="secondary" onPress={handleMockLogin} fullWidth />
           )}
           <Text style={styles.legal}>
-            Blogger 글 발행과 사진 저장(Google Drive) 권한을 요청해요.{'\n'}앱이 만든 파일 외에는 접근하지 않아요.
+            Blogger 글 발행과 사진 저장(Google Drive) 권한을 요청합니다.{'\n'}앱이 생성한 파일 외에는 접근하지 않습니다.
           </Text>
         </View>
       </View>

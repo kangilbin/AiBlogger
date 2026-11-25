@@ -47,7 +47,7 @@ export function PlaceSearch({ value, initialQuery = '', onChange }: Props) {
           setSearched(true);
         }
       } catch (e) {
-        if ((e as Error).name !== 'AbortError') setError(errorMessage(e, '장소 검색에 실패했어요.'));
+        if ((e as Error).name !== 'AbortError') setError(errorMessage(e, '장소 검색에 실패했습니다.'));
       } finally {
         if (!ctrl.signal.aborted) setLoading(false);
       }
@@ -100,10 +100,10 @@ export function PlaceSearch({ value, initialQuery = '', onChange }: Props) {
         </View>
       )}
       {searched && !loading && !error && results.length === 0 && (
-        <Text style={styles.hint}>검색 결과가 없어요. 이름을 바꾸거나 지역을 함께 적어보세요. 못 찾아도 이 단계는 건너뛸 수 있어요(장소명으로 지도를 검색해요).</Text>
+        <Text style={styles.hint}>검색 결과가 없습니다. 이름을 변경하거나 지역을 함께 입력해 보세요. 찾지 못해도 이 단계는 건너뛸 수 있습니다(장소명으로 지도를 검색합니다).</Text>
       )}
       {!hasKakaoSearch && (
-        <Text style={styles.hint}>무료 지도 검색을 쓰는 중이라 일부 가게는 안 나올 수 있어요.</Text>
+        <Text style={styles.hint}>무료 지도 검색을 사용하므로 일부 매장은 검색되지 않을 수 있습니다.</Text>
       )}
     </View>
   );

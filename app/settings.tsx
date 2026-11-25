@@ -29,7 +29,7 @@ export default function SettingsScreen() {
       router.push('/gemini-guide');
       return;
     }
-    Alert.alert('Gemini API 키', '등록된 키를 어떻게 할까요?', [
+    Alert.alert('Gemini API 키', '등록된 키를 어떻게 하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       { text: '새 키로 교체', onPress: () => router.push('/gemini-guide') },
       { text: '삭제', style: 'destructive', onPress: () => { deleteGeminiKey(); } },
@@ -37,7 +37,7 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert('로그아웃', '정말 로그아웃 하시겠어요?', [
+    Alert.alert('로그아웃', '로그아웃하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       { text: '로그아웃', style: 'destructive', onPress: () => logout() },
     ]);

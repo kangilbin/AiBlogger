@@ -8,14 +8,14 @@ interface LoadingOverlayProps {
   message?: string;
 }
 
-export function LoadingOverlay({ visible, message = 'AI가 글을 작성하고 있어요' }: LoadingOverlayProps) {
+export function LoadingOverlay({ visible, message = 'AI가 글을 작성하고 있습니다' }: LoadingOverlayProps) {
   return (
     <Modal transparent visible={visible} animationType="fade" statusBarTranslucent>
       <View style={styles.backdrop}>
         <View style={styles.box}>
           <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.message}>{message}</Text>
-          <Text style={styles.sub}>잠시만 기다려주세요</Text>
+          <Text style={styles.sub}>잠시만 기다려 주세요</Text>
         </View>
       </View>
     </Modal>

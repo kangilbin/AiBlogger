@@ -47,7 +47,7 @@ export default function PublishScreen() {
             <Ionicons name="checkmark" size={44} color={Colors.textInverse} />
           </View>
           <Text style={Typo.display}>발행 완료!</Text>
-          <Text style={styles.successDesc}>블로그에 글이 등록되었어요</Text>
+          <Text style={styles.successDesc}>블로그에 글이 등록되었습니다</Text>
         </View>
         <BottomBar>
           <Button
@@ -61,7 +61,7 @@ export default function PublishScreen() {
           <Button
             label="링크 복사"
             variant="secondary"
-            onPress={() => { Clipboard.setStringAsync(resultUrl); Alert.alert('복사됨', '클립보드에 복사되었어요.'); }}
+            onPress={() => { Clipboard.setStringAsync(resultUrl); Alert.alert('복사됨', '클립보드에 복사되었습니다.'); }}
             fullWidth
           />
           <Button
@@ -80,7 +80,7 @@ export default function PublishScreen() {
       <ScreenHeader title="발행" onBack={() => router.back()} />
 
       <View style={styles.content}>
-        <Text style={Typo.display}>이 글을{'\n'}발행할까요?</Text>
+        <Text style={Typo.display}>이 글을{'\n'}발행하시겠습니까?</Text>
 
         <View style={styles.blogCard}>
           <Text style={styles.blogLabel}>발행할 블로그</Text>

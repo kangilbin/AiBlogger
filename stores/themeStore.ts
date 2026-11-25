@@ -17,8 +17,8 @@ interface ThemeState {
 }
 
 const uid = (p: string) => `${p}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-const EMPTY = { ok: false as const, error: '이름을 입력해주세요.' };
-const DUP = { ok: false as const, error: '이미 있는 이름이에요.' };
+const EMPTY = { ok: false as const, error: '이름을 입력해 주세요.' };
+const DUP = { ok: false as const, error: '이미 존재하는 이름입니다.' };
 
 /** 글 분류 테마 목록(기기 로컬 저장). 이름 변경/삭제는 이미 발행된 글의 라벨에는 영향이 없다 */
 export const useThemeStore = create<ThemeState>()(
@@ -49,7 +49,7 @@ export const useThemeStore = create<ThemeState>()(
         const name = cleanThemeName(raw);
         if (!name) return EMPTY;
         const theme = get().themes.find((t) => t.id === themeId);
-        if (!theme) return { ok: false, error: '상위 카테고리를 찾을 수 없어요.' };
+        if (!theme) return { ok: false, error: '상위 카테고리를 찾을 수 없습니다.' };
         if (hasName(theme.subs.map((x) => x.name), name)) return DUP;
         set((s) => ({
           themes: s.themes.map((t) => (t.id === themeId ? { ...t, subs: [...t.subs, { id: uid('s'), name }] } : t)),
@@ -61,7 +61,7 @@ export const useThemeStore = create<ThemeState>()(
         const name = cleanThemeName(raw);
         if (!name) return EMPTY;
         const theme = get().themes.find((t) => t.id === themeId);
-        if (!theme) return { ok: false, error: '상위 카테고리를 찾을 수 없어요.' };
+        if (!theme) return { ok: false, error: '상위 카테고리를 찾을 수 없습니다.' };
         if (hasName(theme.subs.map((x) => x.name), name, theme.subs.findIndex((x) => x.id === subId))) return DUP;
         set((s) => ({
           themes: s.themes.map((t) =>

@@ -35,7 +35,7 @@ export default function PromptsScreen() {
   const save = () => {
     if (!editing) return;
     if (!editing.name.trim() || !editing.prompt.trim()) {
-      Alert.alert('입력 필요', '이름과 프롬프트를 모두 입력해주세요.');
+      Alert.alert('입력 필요', '이름과 프롬프트를 모두 입력해 주세요.');
       return;
     }
     store.savePreset(editing.id, { name: editing.name.trim(), prompt: editing.prompt.trim() });
@@ -43,13 +43,13 @@ export default function PromptsScreen() {
   };
 
   const confirmDelete = (p: PromptPreset) =>
-    Alert.alert('스타일 삭제', `"${p.name}" 스타일을 삭제할까요?`, [
+    Alert.alert('스타일 삭제', `"${p.name}" 스타일을 삭제하시겠습니까?`, [
       { text: '취소', style: 'cancel' },
       { text: '삭제', style: 'destructive', onPress: () => { store.deletePreset(p.id); setEditing(null); } },
     ]);
 
   const confirmReset = (p: PromptPreset) =>
-    Alert.alert('기본값으로 복원', '수정한 내용을 지우고 기본 프롬프트로 되돌릴까요?', [
+    Alert.alert('기본값으로 복원', '수정한 내용을 지우고 기본 프롬프트로 되돌리시겠습니까?', [
       { text: '취소', style: 'cancel' },
       { text: '복원', onPress: () => { store.resetPreset(p.id); setEditing(null); } },
     ]);
@@ -71,7 +71,7 @@ export default function PromptsScreen() {
             </Field>
             <Field
               label="프롬프트"
-              hint="사진·별점·메모를 반영하는 규칙은 앱이 자동으로 붙여요. 여기에는 말투와 글의 구성 방식만 적으면 돼요."
+              hint="사진·별점·메모를 반영하는 규칙은 앱이 자동으로 추가합니다. 여기에는 말투와 글의 구성 방식만 입력하세요."
               right={<Text style={styles.count}>{editing.prompt.length}/1500</Text>}
             >
               <TextField
